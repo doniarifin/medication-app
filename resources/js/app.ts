@@ -2,14 +2,16 @@ import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import type { DefineComponent } from 'vue';
-import { createApp, h } from 'vue';
+import { createApp, DefineComponent, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 
 import DataTablesCore from 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import 'datatables.net-responsive-dt';
 import DataTable from 'datatables.net-vue3';
+
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 DataTable.use(DataTablesCore);
 
@@ -26,6 +28,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .component('DataTable', DataTable)
+            .component('VueDatePicker', VueDatePicker)
             .mount(el);
     },
     progress: {

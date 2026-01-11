@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MedicalRecord;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class MedicalRecordController extends Controller
@@ -34,10 +35,30 @@ class MedicalRecordController extends Controller
 
         $validated = $request->validate([
             'patient_name' => 'required|string|max:255',
-            'diagnosis' => 'required|string',
+            'examined_at' => 'required|date',
+            'height' => 'required|int',
+            'weight' => 'required|int',
         ]);
 
-        // MedicalRecord::create($validated);
+        try {
+            DB::beginTransaction();
+
+            $medicalRecord = MedicalRecord::create([
+                'patient_name' => $validated['patient_name'],
+                'examined_at' => $validated['examined_at'],
+            ]);
+
+            $medicalRecord->vitalSign()->create([
+                'height' => $validated['height'],
+                'weight' => $validated['weight'],
+            ]);
+
+            DB::commit();
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
 
         return redirect()
             ->route('rekam-medis')
@@ -57,11 +78,14 @@ class MedicalRecordController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
+        $record = MedicalRecord::findOrFail($id);
+
         return Inertia::render('MedicalRecord/Edit', [
-            'id' => $id,
+            'record' => $record,
         ]);
+
     }
 
     /**
@@ -79,6 +103,8 @@ class MedicalRecordController extends Controller
     public function destroy(string $id)
     {
         // delete logic
-        return redirect()->back();
+        MedicalRecord::destroy($id);
+
+        return MedicalRecord::all();
     }
 }

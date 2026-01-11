@@ -1,33 +1,39 @@
 <template>
-    <div class="mt-2 w-full rounded-md border py-2">
+    <div class="w-full py-2">
         <div class="grid grid-cols-4 gap-4 px-2 py-1 pt-2">
             <slot name="input"> Input </slot>
         </div>
         <div class="mt-2 flex w-full justify-end gap-3 px-2 pt-4 pb-2">
-            <Button
+            <AButton
                 v-if="withExport"
-                label="Export"
-                color="yellow"
+                variant="secondary"
+                :loading="props.loading"
+                class="cursor-pointer"
                 @click="clickExport"
                 :disabled="props.disabled"
             >
-                <img class="h-[14px]" src="/img/export.svg" /> Export
-            </Button>
-            <Button
+                Export
+            </AButton>
+            <AButton
                 variant="destructive"
+                :loading="props.loading"
                 class="cursor-pointer"
                 @click="clearFilter"
             >
                 Clear
-            </Button>
-            <Button variant="outline" class="cursor-pointer" @click="apply"
-                >Apply</Button
+            </AButton>
+            <AButton
+                variant="outline"
+                :loading="props.loading"
+                class="cursor-pointer"
+                @click="apply"
+                >Apply</AButton
             >
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import Button from './ui/button/Button.vue';
+import AButton from './app/AButton.vue';
 
 const props = defineProps({
     withExport: { type: Boolean, default: false },
@@ -38,6 +44,7 @@ const props = defineProps({
     value: { type: Boolean, default: false },
     reduce: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
 });
 // const state = reactive({
 //     loading: false,

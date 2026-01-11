@@ -2,78 +2,165 @@
     <div class="overflow-hidden rounded-lg border">
         <div class="flex items-center justify-between p-2">
             <!-- <h1 class="text-lg font-semibold">Rekam Medis</h1> -->
-            <Button
+            <AButton
                 @click="openFilter = !openFilter"
-                class="cursor-pointer bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                class="cursor-pointer bg-blue-400 hover:bg-blue-300"
             >
+                <Icon name="filter" />
                 Filter
-            </Button>
+            </AButton>
 
             <!-- add Button -->
-            <Button @click="addNew" class="cursor-pointer">
-                + Create New
-            </Button>
+            <AButton @click="addNew" class="cursor-pointer">
+                <Icon name="plus" />
+                Add New
+            </AButton>
         </div>
 
         <div class="mb-2 p-2" v-if="openFilter">
-            <div class="overflow-hidden rounded-lg border p-2">
+            <div class="overflow-hidden rounded-lg border p-2 shadow">
                 <slot name="filter"></slot>
             </div>
         </div>
 
-        <table class="mt-4 w-full border-collapse">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th
-                        v-for="header in headers"
-                        :key="header"
-                        class="border px-3 py-2 text-left capitalize"
-                    >
-                        {{ header.replace('_', ' ') }}
-                    </th>
-                    <slot name="head" />
-                    <th class="p-2 text-center">Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr v-if="props.loading">
-                    <td colspan="100" class="p-4 text-center">Loading...</td>
-                </tr>
-                <!-- Data -->
-                <tr
-                    v-else
-                    v-for="(row, rowIndex) in records"
-                    :key="rowIndex"
-                    class="hover:bg-gray-50"
-                >
-                    <td
-                        v-for="header in headers"
-                        :key="header"
-                        class="border px-3 py-2"
-                    >
-                        <slot
-                            :name="`row_${header}`"
-                            :value="row[header]"
-                            :row="row"
+        <div class="overflow-hidden">
+            <table ref="headTable" class="mt-2 w-full border-collapse">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th
+                            v-for="header in headers"
+                            :key="header"
+                            class="border px-3 py-2 capitalize"
                         >
-                            {{ row[header] ?? '-' }}
-                        </slot>
-                    </td>
-                    <td class="border p-2 px-3 py-2 text-center">
-                        <button class="text-blue-600 hover:underline">
-                            Detail
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                            {{ header.replace('_', ' ') }}
+                        </th>
+                        <slot name="head" />
+                        <th class="w-[140px] border px-3 py-2">Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="max-h-screen overflow-y-auto">
+            <table ref="bodyTable" class="w-full">
+                <tbody>
+                    <tr v-if="props.loading">
+                        <td colspan="100" class="justify-items-center p-4">
+                            <div class="items-center">
+                                <Spinner class="h-8 w-8" />
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Data -->
+                    <tr
+                        v-else
+                        v-for="(row, rowIndex) in paginatedRecords"
+                        :key="rowIndex"
+                        class="hover:bg-gray-50"
+                    >
+                        <td
+                            v-for="header in headers"
+                            :key="header"
+                            class="max-w-xs truncate border px-3 py-2"
+                        >
+                            <slot
+                                :name="`row_${header}`"
+                                :value="row[header]"
+                                :row="row"
+                            >
+                                {{ row[header] ?? '-' }}
+                            </slot>
+                        </td>
+                        <slot name="body" />
+                        <td class="border px-3 py-2">
+                            <slot name="action_body" />
+                            <div class="flex justify-center">
+                                <AButton
+                                    @click="editData(row.id)"
+                                    variant="ghost"
+                                    class="cursor-pointer"
+                                >
+                                    <Icon name="pencil"></Icon>
+                                </AButton>
+                                <AButton
+                                    @click="deleteData(row)"
+                                    variant="ghost"
+                                    class="cursor-pointer"
+                                >
+                                    <Icon name="trash"></Icon>
+                                </AButton>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3 flex items-center justify-end gap-2 p-2 text-sm">
+            <div class="flex items-center gap-2">
+                <span>Rows per page:</span>
+                <select
+                    v-model.number="perPage"
+                    @change="changePerPage(perPage)"
+                    class="rounded border px-2 py-1"
+                >
+                    <option
+                        v-for="opt in perPageOptions"
+                        :key="opt"
+                        :value="opt"
+                    >
+                        {{ opt }}
+                    </option>
+                </select>
+            </div>
+
+            <AButton
+                type="button"
+                @click="prevPage"
+                :disabled="currentPage === 1"
+                class="cursor-pointer rounded-full px-3 py-2"
+            >
+                <Icon name="ChevronLeft" stroke-width="4"></Icon>
+            </AButton>
+
+            <template v-for="page in pages" :key="page">
+                <button
+                    v-if="page !== '…'"
+                    @click="goToPage(Number(page))"
+                    :class="[
+                        'cursor-pointer rounded border px-3 py-1 hover:bg-blue-200',
+                        currentPage === page
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white',
+                    ]"
+                >
+                    {{ page }}
+                </button>
+                <span v-else class="px-2 py-1">…</span>
+            </template>
+
+            <AButton
+                @click="nextPage"
+                :disabled="currentPage === totalPages"
+                class="cursor-pointer rounded-full px-3 py-2"
+            >
+                <Icon name="ChevronRight" stroke-width="4"></Icon>
+            </AButton>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import Button from '../ui/button/Button.vue';
+import {
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    watch,
+} from 'vue';
+import AButton from '../app/AButton.vue';
+import Icon from '../Icon.vue';
+import { Spinner } from '../ui/spinner';
 
 const props = defineProps<{
     // url: string;
@@ -83,6 +170,8 @@ const props = defineProps<{
 
 const emit = defineEmits({
     addNew: null,
+    editData: null,
+    deleteData: null,
     close: null,
     clearFilter: null,
     apply: null,
@@ -90,6 +179,7 @@ const emit = defineEmits({
 });
 
 const openFilter = ref(false);
+// const headTable = ref(null);
 
 const hiddenColumns = ['id'];
 
@@ -100,7 +190,131 @@ const headers = computed(() => {
     );
 });
 
+const currentPage = ref(1);
+const perPage = ref(5);
+
+const totalPages = computed(() =>
+    Math.ceil(props.records.length / perPage.value),
+);
+
+const perPageOptions = [3, 5, 10, 20, 50];
+
+const paginatedRecords = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return props.records.slice(start, end);
+});
+
+function changePerPage(value: number) {
+    perPage.value = value;
+    currentPage.value = 1;
+}
+
+function nextPage() {
+    if (currentPage.value < totalPages.value) currentPage.value++;
+}
+
+function prevPage() {
+    if (currentPage.value > 1) currentPage.value--;
+}
+
 function addNew(value: any) {
     emit('addNew', value);
 }
+
+function editData(value: any) {
+    emit('editData', value);
+}
+function deleteData(value: any) {
+    emit('deleteData', value);
+}
+
+const maxVisible = 4;
+
+const pageWindow = computed(() => {
+    const visible = Math.min(maxVisible, totalPages.value);
+    let start = 1;
+    let end = visible;
+
+    if (currentPage.value > totalPages.value - visible + 1) {
+        start = totalPages.value - visible + 1;
+        end = totalPages.value;
+    } else if (currentPage.value > 2) {
+        start = currentPage.value - 1;
+        end = start + visible - 1;
+    }
+
+    if (start < 1) start = 1;
+    if (end > totalPages.value) end = totalPages.value;
+
+    return { start, end };
+});
+
+const pages = computed(() => {
+    const { start, end } = pageWindow.value;
+    const arr: (number | string)[] = [];
+
+    if (start > 1) arr.push('…');
+    for (let i = start; i <= end; i++) arr.push(i);
+    if (end < totalPages.value) arr.push('…');
+
+    return arr;
+});
+
+function goToPage(page: number | string) {
+    if (page === '…') {
+        if (currentPage.value < totalPages.value - maxVisible + 1) {
+            currentPage.value += maxVisible;
+            if (currentPage.value > totalPages.value)
+                currentPage.value = totalPages.value;
+        } else {
+            currentPage.value -= maxVisible;
+            if (currentPage.value < 1) currentPage.value = 1;
+        }
+    } else if (typeof page === 'number') {
+        currentPage.value = page;
+    }
+}
+
+const headTable = ref<HTMLTableElement | null>(null);
+const bodyTable = ref<HTMLTableElement | null>(null);
+
+const syncColumnWidth = () => {
+    if (!headTable.value || !bodyTable.value) return;
+
+    const ths = headTable.value.querySelectorAll('th');
+    const bodyRows = bodyTable.value.querySelectorAll('tr');
+
+    ths.forEach((th, index) => {
+        const width = th.offsetWidth;
+
+        bodyRows.forEach((row) => {
+            const td = row.children[index] as HTMLElement;
+            if (td) {
+                td.style.width = `${width}px`;
+                td.style.minWidth = `${width}px`;
+                td.style.maxWidth = `${width}px`;
+            }
+        });
+    });
+};
+
+onMounted(async () => {
+    await nextTick();
+    syncColumnWidth();
+    window.addEventListener('resize', syncColumnWidth);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', syncColumnWidth);
+});
+
+watch(
+    () => paginatedRecords,
+    async () => {
+        await nextTick();
+        syncColumnWidth();
+    },
+    { deep: true },
+);
 </script>
