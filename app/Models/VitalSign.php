@@ -7,6 +7,10 @@ use Illuminate\Support\Str;
 
 class VitalSign extends Model
 {
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'medical_record_id',
         'height',

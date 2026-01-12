@@ -32,6 +32,7 @@ const props = defineProps({
 
 <template>
     <Button
+        :as="'div'"
         :size="props.size"
         :variant="props.variant"
         :class="[

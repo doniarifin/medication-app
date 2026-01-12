@@ -10,6 +10,11 @@ class ResepDokter extends Model
         'medical_record_id',
     ];
 
+    protected $casts = [
+        'resep_dokter' => 'array',
+    ];
+
+
     public function medicalRecord()
     {
         return $this->belongsTo(MedicalRecord::class);

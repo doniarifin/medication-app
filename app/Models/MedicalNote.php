@@ -8,6 +8,8 @@ class MedicalNote extends Model
 {
     protected $fillable = [
         'medical_record_id',
+        'notes',
+        'attachment_id',
     ];
 
     public function medicalRecord()

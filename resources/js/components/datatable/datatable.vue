@@ -35,7 +35,12 @@
                             {{ header.replace('_', ' ') }}
                         </th>
                         <slot name="head" />
-                        <th class="w-[140px] border px-3 py-2">Action</th>
+                        <th
+                            v-if="paginatedRecords.length"
+                            class="w-[140px] border px-3 py-2"
+                        >
+                            Action
+                        </th>
                     </tr>
                 </thead>
             </table>
@@ -89,6 +94,17 @@
                                     <Icon name="trash"></Icon>
                                 </AButton>
                             </div>
+                        </td>
+                    </tr>
+                    <tr
+                        v-if="!paginatedRecords.length && !props.loading"
+                        class="hover:bg-gray-50"
+                    >
+                        <td
+                            colspan="100"
+                            class="justify-items-center p-4 py-20"
+                        >
+                            <div class="items-center">No Data</div>
                         </td>
                     </tr>
                 </tbody>

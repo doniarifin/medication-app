@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('medical_attachments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('medical_record_id')->constrained()->cascadeOnDelete();
+            $table->string('path')->nullable();
+            $table->string('original_name')->nullable();
+            $table->string('mime_type')->nullable();
+            $table->unsignedBigInteger('size')->nullable();
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });
     }

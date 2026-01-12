@@ -40,11 +40,45 @@ function showAlert(
     });
 }
 
-export const showInfo = (msg: string, autoHide?: number, title?: string) =>
-    showAlert(msg, 'info', title, autoHide);
+export function showInfo(msg: any, autoHide?: number, title?: string) {
+    let messages = '';
 
-export const showSuccess = (msg: string, autoHide?: number, title?: string) =>
-    showAlert(msg, 'success', title, autoHide);
+    if (typeof msg === 'string') {
+        messages = msg;
+    } else if (msg && Object.keys(msg).length) {
+        messages = Object.values(msg).flat().join('\n');
+    } else {
+        messages = 'No Information';
+    }
 
-export const showError = (msg: string, autoHide?: number, title?: string) =>
-    showAlert(msg, 'error', title, autoHide);
+    showAlert(messages, 'info', title, autoHide);
+}
+
+export function showSuccess(msg: any, autoHide?: number, title?: string) {
+    let messages = '';
+
+    if (typeof msg === 'string') {
+        messages = msg;
+    } else if (msg && Object.keys(msg).length) {
+        messages = Object.values(msg).flat().join('\n');
+    } else {
+        messages = 'Success';
+    }
+
+    console.log(messages);
+    showAlert(messages, 'success', title, autoHide);
+}
+
+export function showError(msg: any, autoHide?: number, title?: string) {
+    let messages = '';
+
+    if (typeof msg === 'string') {
+        messages = msg;
+    } else if (msg && Object.keys(msg).length) {
+        messages = Object.values(msg).flat().join('\n');
+    } else {
+        messages = 'Error Occured';
+    }
+
+    showAlert(messages, 'error', title, autoHide);
+}

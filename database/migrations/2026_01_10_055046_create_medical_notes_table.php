@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('medical_notes', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->string('notes');
+            $table->string('attachment_id');
             $table->foreignUuid('medical_record_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

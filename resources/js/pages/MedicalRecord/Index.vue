@@ -1,5 +1,5 @@
 <template>
-    <Head title="Dashboard" />
+    <Head title="Rekam Medis" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
@@ -23,7 +23,7 @@
                                 <FInput
                                     label="Patient Name"
                                     :loading="data.loading"
-                                    v-model="data.filter.patientName"
+                                    v-model="data.filter.patient_name"
                                     kind="text"
                                     class="rounded-lg"
                                 />
@@ -33,13 +33,13 @@
                 </template>
 
                 <template #row_examined_at="{ row }">
-                    {{ new Date(row.examined_at).toLocaleString() }}
+                    {{ convertStrDate(row.examined_at) }}
                 </template>
                 <template #row_created_at="{ row }">
-                    {{ new Date(row.created_at).toLocaleString() }}
+                    {{ convertStrDate(row.created_at) }}
                 </template>
                 <template #row_updated_at="{ row }">
-                    {{ new Date(row.updated_at).toLocaleString() }}
+                    {{ convertStrDate(row.updated_at) }}
                 </template>
             </Datatable>
         </div>
@@ -47,20 +47,20 @@
             <template #body> Are you sure to delete this data? </template>
             <template #footer>
                 <AButton
-                    variant="outline"
-                    :loading="data.loading"
-                    class="cursor-pointer"
-                    @click="showModal = false"
-                >
-                    Cancel
-                </AButton>
-                <AButton
                     variant="destructive"
                     :loading="data.loading"
                     class="cursor-pointer"
                     @click="onDelete"
                 >
                     Yes
+                </AButton>
+                <AButton
+                    variant="outline"
+                    :loading="data.loading"
+                    class="cursor-pointer"
+                    @click="showModal = false"
+                >
+                    Cancel
                 </AButton>
             </template>
         </AModal>
@@ -79,7 +79,8 @@ import { rekamMedis } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { onMounted, reactive, ref } from 'vue';
+import moment from 'moment';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -88,13 +89,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const props = defineProps({
+    records: Object,
+    filters: Object,
+});
+
 const data = reactive({
     loading: false,
     selectedId: '',
-    records: [],
-    filter: {
-        patientName: '',
-    },
+    records: [] as any,
+    filter: {} as any,
 });
 
 const showModal = ref(false);
@@ -112,11 +116,25 @@ function deleteData(record: any) {
     showModal.value = true;
 }
 
+async function getData() {
+    data.loading = true;
+
+    try {
+        const res = await axios.post('/api/rekam-medis/getdata', data.filter);
+        data.records = res.data;
+        data.loading = false;
+    } catch (error) {
+        showError(String(error));
+    } finally {
+        data.loading = false;
+    }
+}
+
 async function onDelete() {
     data.loading = true;
     try {
-        const res = await axios.delete(`/api/rekam-medis/${data.selectedId}`);
-        data.records = res.data;
+        await axios.delete(`/api/rekam-medis/${data.selectedId}`);
+        getData();
         showModal.value = false;
         showSuccess('Delete data success');
         data.selectedId = '';
@@ -131,28 +149,28 @@ async function onDelete() {
     }
 }
 
-async function getData() {
-    data.loading = true;
-    const res = await axios.get('/api/rekam-medis');
-
-    data.records = res.data;
-    // console.log(data.records);
-    data.loading = false;
-}
-
 function applyFilter() {
-    // page.value = 1;
-    // state.skip = 0;
     getData();
 }
 
 function clearFilter() {
-    data.filter = {
-        patientName: '',
-    };
+    data.filter = {};
 
     getData();
 }
+
+function convertStrDate(datetime: string): string {
+    return moment(datetime).format('DD MMM YYYY');
+}
+
+watch(
+    () => props.records,
+    (val) => {
+        data.records = val?.data;
+        data.loading = false;
+    },
+    { immediate: true },
+);
 
 onMounted(getData);
 </script>

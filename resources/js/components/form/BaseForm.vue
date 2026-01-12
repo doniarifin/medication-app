@@ -60,7 +60,7 @@ function back() {
     </div>
     <form
         @submit.prevent="emit('submit')"
-        class="h-screen space-y-6 bg-white p-6 shadow"
+        class="space-y-6 bg-white p-6 pb-20 shadow"
     >
         <!-- Content -->
         <div class="space-y-4">
