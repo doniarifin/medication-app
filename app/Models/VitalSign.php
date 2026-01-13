@@ -20,6 +20,7 @@ class VitalSign extends Model
         'heart_rate',
         'respiration_rate',
         'body_temperature',
+        'updated_at',
     ];
 
     public function medicalRecord()

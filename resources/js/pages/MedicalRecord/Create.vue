@@ -5,6 +5,9 @@ const props = defineProps({
     medicalRecord: Object,
     vitalSign: Object,
     medAttachment: Object,
+    resepDokter: Object,
+    medicalNotes: Object,
+    form: String,
 });
 </script>
 
@@ -13,5 +16,7 @@ const props = defineProps({
         :medical-record="props.medicalRecord"
         :vital-sign="props.vitalSign"
         :med-attachment="props.medAttachment"
+        :med-notes="props.medicalNotes"
+        :form="'new'"
     />
 </template>

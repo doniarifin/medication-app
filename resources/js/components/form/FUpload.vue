@@ -15,6 +15,7 @@
 
         <div class="flex items-center gap-2">
             <div
+                v-if="!props.loading"
                 class="flex cursor-pointer items-center gap-2"
                 variant="outline"
                 @click="openFile"
@@ -29,7 +30,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="fileName">
+            <div v-if="fileName && !props.loading">
                 <AButton
                     variant="ghost"
                     class="cursor-pointer"
@@ -38,6 +39,7 @@
                     <Icon name="x" strokeWidth="4"></Icon>
                 </AButton>
             </div>
+            <Skeleton v-if="props.loading" class="custom-input h-10 w-30" />
         </div>
     </div>
 </template>
@@ -46,6 +48,7 @@
 import { ref, watch } from 'vue';
 import Icon from '../Icon.vue';
 import AButton from '../app/AButton.vue';
+import { Skeleton } from '../ui/skeleton';
 
 const props = defineProps({
     label: { type: String, default: '' },

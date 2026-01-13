@@ -11,7 +11,7 @@
             </AButton>
 
             <!-- add Button -->
-            <AButton @click="addNew" class="cursor-pointer">
+            <AButton @click.once="addNew" class="cursor-pointer">
                 <Icon name="plus" />
                 Add New
             </AButton>
@@ -32,7 +32,14 @@
                             :key="header"
                             class="border px-3 py-2 capitalize"
                         >
-                            {{ header.replace('_', ' ') }}
+                            <slot
+                                :name="`header_${header}`"
+                                :value="header"
+                                :header="header"
+                            >
+                                <!-- {{ row[header] ?? '-' }} -->
+                                {{ header.replace('_', ' ') }}
+                            </slot>
                         </th>
                         <slot name="head" />
                         <th
@@ -80,18 +87,26 @@
                             <slot name="action_body" />
                             <div class="flex justify-center">
                                 <AButton
-                                    @click="editData(row.id)"
+                                    @click.once="editData(row.id)"
                                     variant="ghost"
-                                    class="cursor-pointer"
+                                    class="cursor-pointer hover:opacity-50"
                                 >
-                                    <Icon name="pencil"></Icon>
+                                    <Icon
+                                        class="text-blue-400"
+                                        stroke-width="3"
+                                        name="SquarePen"
+                                    ></Icon>
                                 </AButton>
                                 <AButton
-                                    @click="deleteData(row)"
+                                    @click.prevent="deleteData(row)"
                                     variant="ghost"
-                                    class="cursor-pointer"
+                                    class="cursor-pointer hover:opacity-50"
                                 >
-                                    <Icon name="trash"></Icon>
+                                    <Icon
+                                        class="text-red-400"
+                                        stroke-width="3"
+                                        name="trash"
+                                    ></Icon>
                                 </AButton>
                             </div>
                         </td>

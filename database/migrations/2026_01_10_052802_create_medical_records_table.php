@@ -15,7 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('patient_name');
             $table->timestamp('examined_at');
-            $table->decimal('medicine_price', 10, 2)->nullable();
+            $table->boolean('is_paid')->default(false);
+            // $table->decimal('medicine_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }

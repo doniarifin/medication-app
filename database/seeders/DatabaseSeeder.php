@@ -5,6 +5,10 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,9 +19,37 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $users = [
+            [
+                'email' => 'dokter@example.com',
+                'name' => 'Dokter',
+                'role' => 'doctor',
+                'password' => Hash::make('doctor123'),
+            ],
+            [
+                'email' => 'apoteker@example.com',
+                'name' => 'Apoteker',
+                'role' => 'pharmacist',
+                'password' => Hash::make('pharmacist123'),
+            ],
+        ];
+
+        foreach ($users as $user) {
+            DB::table('users')->updateOrInsert(
+                ['email' => $user['email']],
+                [
+                    'id' => Str::uuid(),
+                    'name' => $user['name'],
+                    'role' => $user['role'],
+                    'password' => $user['password'],
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
+
+        $this->call([
+            MedicineSeeder::class,
         ]);
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\MedicalAttachment;
+use App\Models\MedicalNote;
 use App\Models\MedicalRecord;
+use App\Models\ResepDokter;
 use App\Models\VitalSign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -63,16 +65,28 @@ class MedicalRecordController extends Controller
     public function store(Request $request)
     {
 
+        foreach (['height', 'weight', 'systole', 'diastole', 'heart_rate', 'respiration_rate', 'body_temperature'] as $field) {
+            if ($request->filled($field)) {
+                $request->merge([
+                    $field => str_replace(',', '.', $request->$field),
+                ]);
+            }
+        }
         $validated = $request->validate([
             'patient_name' => 'required|string|max:255',
             'examined_at' => 'required|date',
-            'height' => 'required|integer|max:999',
-            'weight' => 'required|integer|max:999',
-            'systole' => 'required|integer',
-            'diastole' => 'required|integer',
-            'heart_rate' => 'required|integer',
-            'respiration_rate' => 'required|integer',
-            'body_temperature' => 'required|numeric',
+            //vitalsign
+            'height' => 'nullable|numeric|max:999',
+            'weight' => 'nullable|numeric|max:999',
+            'systole' => 'nullable|numeric',
+            'diastole' => 'nullable|numeric',
+            'heart_rate' => 'nullable|numeric',
+            'respiration_rate' => 'nullable|numeric',
+            'body_temperature' => 'nullable|numeric',
+            //resepdokter
+            'resep_dokter' => 'nullable|array',
+            //note
+            'notes' => 'nullable',
         ]);
 
         try {
@@ -81,6 +95,7 @@ class MedicalRecordController extends Controller
             $medicalRecord = MedicalRecord::create([
                 'patient_name' => $validated['patient_name'],
                 'examined_at' => $validated['examined_at'],
+                'is_paid' => $request->is_paid ? 1 : 0,
             ]);
 
             $medicalRecord->vitalSign()->create([
@@ -93,13 +108,27 @@ class MedicalRecordController extends Controller
                 'body_temperature' => $validated['body_temperature'],
             ]);
 
+            $medicalRecord->resepDokter()->create([
+                'resep_dokter' => $validated['resep_dokter'],
+            ]);
+
+            $medicalRecord->note()->create([
+                'notes' => $validated['notes'],
+            ]);
+
+
             DB::commit();
         } catch (\Throwable $e) {
+            // dd($e);
             DB::rollBack();
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'failed save medical record: ' . $e->getMessage());
+            throw $e;
+            // return redirect()->back()
+            //     ->withInput()
+            //     ->withjson('error', 'failed save medical record: ' . $e->getMessage())
+            //     ;
         }
+
+        $medicalRecord->load('vitalSign', 'resepDokter', 'note');
 
         return response()->json([
             "messages" => "update success",
@@ -126,11 +155,15 @@ class MedicalRecordController extends Controller
         $medicalRecord = MedicalRecord::findOrFail($id);
         $vitalSign = VitalSign::where('medical_record_id', $medicalRecord->id)->first();
         $medAttachment = MedicalAttachment::where('medical_record_id', $medicalRecord->id)->first();
+        $resepDokter = ResepDokter::where('medical_record_id', $medicalRecord->id)->first();
+        $medicalNotes = MedicalNote::where('medical_record_id', $medicalRecord->id)->first();
 
         return Inertia::render('MedicalRecord/Edit', [
             'medicalRecord' => $medicalRecord,
             'vitalSign' => $vitalSign,
             'medAttachment' => $medAttachment,
+            'resepDokter' => $resepDokter,
+            'medicalNotes' => $medicalNotes,
         ]);
     }
 
@@ -147,16 +180,29 @@ class MedicalRecordController extends Controller
             ], 404);
         }
 
+        foreach (['height', 'weight', 'systole', 'diastole', 'heart_rate', 'respiration_rate', 'body_temperature'] as $field) {
+            if ($request->filled($field)) {
+                $request->merge([
+                    $field => str_replace(',', '.', $request->$field),
+                ]);
+            }
+        }
+
         $validated = $request->validate([
             'patient_name' => 'required|string|max:255',
             'examined_at' => 'required|date',
-            'height' => 'required|integer|max:999',
-            'weight' => 'required|integer|max:999',
-            'systole' => 'required|integer',
-            'diastole' => 'required|integer',
-            'heart_rate' => 'required|integer',
-            'respiration_rate' => 'required|integer',
-            'body_temperature' => 'required|numeric',
+            //vitalsign
+            'height' => 'nullable|numeric|max:999',
+            'weight' => 'nullable|numeric|max:999',
+            'systole' => 'nullable|numeric',
+            'diastole' => 'nullable|numeric',
+            'heart_rate' => 'nullable|numeric',
+            'respiration_rate' => 'nullable|numeric',
+            'body_temperature' => 'nullable|numeric',
+            //resepdokter
+            'resep_dokter' => 'nullable|array',
+            //note
+            'notes' => 'nullable',
         ]);
 
         try {
@@ -165,19 +211,35 @@ class MedicalRecordController extends Controller
             $record->update([
                 'patient_name' => $validated['patient_name'],
                 'examined_at'  => $validated['examined_at'],
+                'is_paid' => $request->is_paid ? 1 : 0,
+                'updated_at'  => now(),
             ]);
 
             // vital sign
-            VitalSign::where('medical_record_id', $record->id)
-                ->update([
-                    'height' => $validated['height'],
-                    'weight' => $validated['weight'],
-                    'systole' => $validated['systole'],
-                    'diastole' => $validated['diastole'],
-                    'heart_rate' => $validated['heart_rate'],
-                    'respiration_rate' => $validated['respiration_rate'],
-                    'body_temperature' => $validated['body_temperature'],
-                ]);
+            $vitalSign = VitalSign::where('medical_record_id', $record->id)->first();
+            $vitalSign?->update([
+                'height' => $validated['height'],
+                'weight' => $validated['weight'],
+                'systole' => $validated['systole'],
+                'diastole' => $validated['diastole'],
+                'heart_rate' => $validated['heart_rate'],
+                'respiration_rate' => $validated['respiration_rate'],
+                'body_temperature' => $validated['body_temperature'],
+                'updated_at'  => now(),
+            ]);
+
+            //resep dokter
+            $resepDokter = ResepDokter::where('medical_record_id', $record->id)->first();
+            $resepDokter?->update([
+                'resep_dokter' => $validated['resep_dokter'],
+                'updated_at'  => now(),
+            ]);
+
+            $medNote = MedicalNote::where('medical_record_id', $record->id)->first();
+            $medNote?->update([
+                'notes' => $validated['notes'],
+                'updated_at'  => now(),
+            ]);
 
             DB::commit();
         } catch (\Throwable $e) {
@@ -187,7 +249,12 @@ class MedicalRecordController extends Controller
 
         return response()->json([
             "messages" => "update success",
-            "data" => $record
+            'data' => [
+                'medical_record' => $record->fresh(),
+                'vital_sign' => $vitalSign,
+                'resep_dokter' => $resepDokter,
+                'medical_notes' => $medNote,
+            ]
         ]);
     }
 
@@ -203,33 +270,4 @@ class MedicalRecordController extends Controller
 
         return response()->json($records);
     }
-
-
-    // public function upload(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    //     ]);
-
-    //     // $path = $request->file('file')->store('uploads', 'public');
-
-    //     $file = $request->file('file');
-    //     $path = $file->store('attachments', 'public');
-
-    //     MedicalAttachment::insert([
-    //         'id' => $request->id,
-    //         'medical_record_id' => $request->medical_record_id,
-    //         'path' => $path,
-    //         'original_name' => $file->getClientOriginalName(),
-    //         'mime_type' => $file->getMimeType(),
-    //         'size' => $file->getSize(),
-    //         'created_at' => $request->created_at,
-    //         'updated_at' => $request->now(),
-    //     ]);
-
-    //     return response()->json([
-    //         'path' => $path,
-    //         'url'  => Storage::disk('public')->path($path),
-    //     ]);
-    // }
 }

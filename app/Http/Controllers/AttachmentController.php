@@ -30,10 +30,13 @@ class AttachmentController extends Controller
     public function upload(Request $request)
     {
         if ($request->file) {
+            $request->validate([
+                'file' => 'required|file|max:2048',
+            ]);
+
             $file = $request->file('file');
             $path = $file->store('attachments', 'public');
         }
-
 
         if ($request->id) {
             //update

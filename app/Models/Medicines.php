@@ -6,24 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 
-class MedicalNote extends Model
+class Medicines extends Model
 {
+    //
 
     protected $keyType = 'string';
     public $incrementing = false;
 
+
     protected $fillable = [
-        'medical_record_id',
-        'notes',
-        // 'attachment_id',
-        'updated_at',
+        'name',
     ];
 
-    public function medicalRecord()
-    {
-        return $this->belongsTo(MedicalRecord::class);
-    }
-    //generate uuid
+    // generate uuid
     protected static function booted()
     {
         static::creating(function ($model) {

@@ -12,17 +12,19 @@ class MedicalRecord extends Model
     use HasUuids;
 
     protected $keyType = 'string';
-
     public $incrementing = false;
 
     protected $fillable = [
         'patient_name',
         'examined_at',
         'medicine_price',
+        'is_paid',
+        'updated_at',
     ];
 
     protected $casts = [
         'examined_at' => 'datetime',
+        'is_paid' => 'boolean',
     ];
 
     public function vitalSign()

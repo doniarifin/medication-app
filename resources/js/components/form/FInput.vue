@@ -7,6 +7,7 @@
             <input
                 v-if="!props.loading"
                 v-model="internalValue"
+                :type="props.kind"
                 :placeholder="placeholder"
                 :disabled="disabled"
                 :loading="props.loading"
@@ -62,7 +63,7 @@ const props = defineProps({
     class: { type: String, default: '' },
     kind: { type: String, default: 'text' },
     kindDate: { type: String, default: 'datetime-local' },
-    modelValue: { type: [String, Number], default: '' },
+    modelValue: { type: [String, Number, null], default: '' },
     placeholder: { type: String, default: 'type here..' },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },

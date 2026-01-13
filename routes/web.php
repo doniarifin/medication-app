@@ -3,6 +3,7 @@
 use App\Enums\UserRole;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\MedicalRecordController;
+use App\Http\Controllers\MedicinesController;
 use App\Models\MedicalAttachment;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -44,6 +45,10 @@ Route::middleware([
         ->name('attachment.gets');
     Route::post('/api/attachment/upload', [AttachmentController::class, 'upload'])
         ->name('attachment.upload');
+
+    //api medicines
+    Route::post('/api/medicines/getdata', [MedicinesController::class, 'getData'])
+        ->name('medicines.getdata');
 });
 
 require __DIR__ . '/settings.php';

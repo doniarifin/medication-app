@@ -16,8 +16,11 @@ defineProps<{
             </p>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-2">
+        <div v-if="$slots.default" class="grid gap-4 md:grid-cols-2">
             <slot />
         </div>
+        <template v-if="$slots['form-section']">
+            <slot name="form-section" />
+        </template>
     </section>
 </template>

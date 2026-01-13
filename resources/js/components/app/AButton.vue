@@ -47,7 +47,9 @@ const props = defineProps({
         <template #default>
             <span class="flex items-center gap-2">
                 <Spinner v-if="props.loading" />
-                <slot />
+                <slot>
+                    {{ props.label }}
+                </slot>
             </span>
         </template>
     </Button>
