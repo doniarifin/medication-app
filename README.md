@@ -154,7 +154,7 @@ Berikut penjelasan tiap bagian Menu:
 
 ![Menu](./resep.png)
 
-1. Export ada di menu Resep Dokter
+click icon pencil untuk memunculkan Menu export dan update pembayaran
 
 - button export disable jika belum melakukan pembayaran
 - button save akan disable jika sudah melakukan pembayaran
