@@ -77,9 +77,20 @@ php artisan db:seed
 
 jika sudah run db seed maka bisa login dengan:
 
-email: admin@example.com
+admin:
 
-pass: admin123
+`email: admin@example.com`,
+`pass: admin123`
+
+dokter:
+
+`email: dokter@example.com`,
+`pass: dokter123`
+
+apoteker:
+
+`email: apoteker@example.com`,
+`pass: apoteker`
 
 **Note:**
 
