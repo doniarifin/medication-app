@@ -145,10 +145,12 @@ Berikut penjelasan tiap bagian Menu:
 
 2. Button
 
-- Filter: Untuk mencari pasien berdasarkan nama.
-- Button edit (icon pensil) dan hapus (icon sampah) data.
+- Button Filter: Untuk membuka field inputan.
+- Button Edit (icon pensil) dan Hapus (icon sampah) data.
   **Edit button** hanya untuk data yg belum dibayar
 - Add New digunakan untuk menambahkan data pasien baru.
+- Apply untuk search
+- Clear untuk reset pencarian
 
 ## Resep Dokter
 
