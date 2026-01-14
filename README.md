@@ -85,13 +85,16 @@ pass: admin123
 
 jika ingin membuat akun sendiri maka set `role` harus sesuai enum yg ada di path `./app/Enums/UserRole.php`
 
-misal
+list enums role:
 
 ```
+case Admin = 'admin';
 case Doctor = 'doctor';
+case Pharmacist = 'pharmacist';
+case User = 'user';
 ```
 
-maka column **role** di taber **users** harus `doctor`
+jika ingin role **Dokter** maka column **role** di tabel **users** harus `doctor`
 
 ### 6. Jalankan app
 
