@@ -32,7 +32,10 @@ const mainNavItems = computed<NavItem[]>(() => {
         },
     ];
 
-    if (userRole.value === UserRole.Doctor) {
+    if (
+        userRole.value === UserRole.Admin ||
+        userRole.value === UserRole.Doctor
+    ) {
         items.push({
             title: 'Rekam Medis',
             href: rekamMedis(),
@@ -41,7 +44,7 @@ const mainNavItems = computed<NavItem[]>(() => {
     }
 
     if (
-        userRole.value === UserRole.Doctor ||
+        userRole.value === UserRole.Admin ||
         userRole.value === UserRole.Pharmacist
     ) {
         items.push({
@@ -51,6 +54,7 @@ const mainNavItems = computed<NavItem[]>(() => {
         });
     }
     if (
+        userRole.value === UserRole.Admin ||
         userRole.value === UserRole.Doctor ||
         userRole.value === UserRole.Pharmacist
     ) {

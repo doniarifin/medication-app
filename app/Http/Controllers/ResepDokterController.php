@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\MedicalRecord;
+use App\Models\Pembayaran;
 use App\Models\ResepDokter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ResepDokterController extends Controller
 {
@@ -47,9 +48,6 @@ class ResepDokterController extends Controller
 
         return response()->json($data);
     }
-
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -98,6 +96,7 @@ class ResepDokterController extends Controller
 
         $validated = $request->validate([
             'is_paid' => 'required|bool',
+            'total_price' => 'numeric',
         ]);
 
         try {
@@ -107,6 +106,16 @@ class ResepDokterController extends Controller
                 'is_paid' => (bool) $validated['is_paid'],
                 'updated_at'  => now(),
             ]);
+
+            // pembayaran
+            Pembayaran::updateOrCreate(
+                ['medical_record_id' => $record->id],
+                [
+                    'total_price' => $validated['total_price'],
+                    'updated_at' => now(),
+                ]
+            );
+
 
             DB::commit();
         } catch (\Throwable $e) {
@@ -128,5 +137,29 @@ class ResepDokterController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    //export pdf
+
+
+
+    public function exportPdf($id)
+    {
+        $record = MedicalRecord::with('resepDokter')->findOrFail($id);
+
+        $record->resep_dokter = $record->resepDokter->first();
+        unset($record->resepDokter);
+
+        $record->pembayaran = $record->pembayaran->first();
+
+        $data = $record;
+
+        // dd($data);
+
+        $pdf = Pdf::loadView('pdf.resep', [
+            'data' => $data
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download('resi-pembayaran.pdf');
     }
 }

@@ -114,6 +114,24 @@
                     @close-modal="showEditModal = false"
                 />
             </template>
+            <template #footer>
+                <AButton
+                    as="button"
+                    :disabled="disableSaveBtn"
+                    type="submit"
+                    class="cursor-pointer"
+                    @click.prevent="submit"
+                    >Save</AButton
+                >
+                <AButton
+                    as="button"
+                    :disabled="disableExport"
+                    type="submit"
+                    class="cursor-pointer"
+                    @click.prevent="exportPdf"
+                    >Export</AButton
+                >
+            </template>
         </AModal>
     </AppLayout>
 </template>
@@ -170,6 +188,7 @@ const showDeleteModal = ref(false);
 const showEditModal = ref(false);
 const formRef = ref(null as any);
 const disableSaveBtn = ref(false);
+const disableExport = ref(false);
 
 function addNew() {
     router.visit('rekam-medis/create');
@@ -181,6 +200,7 @@ function editData(record: any) {
     console.log(formRef.value);
     showEditModal.value = true;
     disableSaveBtn.value = record.is_paid;
+    disableExport.value = !record.is_paid;
     data.selectedId = record.id;
 }
 
@@ -239,6 +259,11 @@ function convertStrDate(datetime: string): string {
 async function submit() {
     await formRef.value?.submit();
     getData();
+}
+
+async function exportPdf() {
+    await formRef.value?.exportPdf(data.selectedId);
+    // getData();
 }
 
 watch(

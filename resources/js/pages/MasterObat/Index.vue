@@ -11,6 +11,8 @@
                 @deleteData="deleteData"
                 :records="data.records"
                 :loading="data.loading"
+                :withAddBtn="false"
+                :withAction="false"
             >
                 <template #filter>
                     <Filter

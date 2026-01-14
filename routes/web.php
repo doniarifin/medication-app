@@ -22,11 +22,8 @@ Route::get('dashboard', function () {
 
 Route::middleware([
     'auth',
-    'role:' . UserRole::Doctor->value,
+    'role:' . UserRole::Admin->value . ',' . UserRole::Doctor->value,
 ])->group(function () {
-    /**
-     * route untuk inertia
-     */
 
     // rekam medis
     Route::get('/rekam-medis', function () {
@@ -36,22 +33,6 @@ Route::middleware([
         ->name('rekam-medis.create');
     Route::get('/rekam-medis/{id}/edit', [MedicalRecordController::class, 'edit'])
         ->name('rekam-medis.edit');
-
-    //resep dokter
-    Route::get('/resep', function () {
-        return Inertia::render('ResepDokter/Index');
-    })->name('resep');
-
-
-    // medicines
-    Route::get('/masterObat', function () {
-        return Inertia::render('MasterObat/Index');
-    })->name('masterObat');
-
-
-    /**
-     * route untuk api
-     */
 
     // api rekam-meids
     Route::post('/api/rekam-medis/insert', [MedicalRecordController::class, 'store'])
@@ -70,19 +51,39 @@ Route::middleware([
         ->name('attachment.gets');
     Route::post('/api/attachment/upload', [AttachmentController::class, 'upload'])
         ->name('attachment.upload');
-
-    //api medicines
-    Route::post('/api/medicines/getdata', [MedicinesController::class, 'getData'])
-        ->name('medicines.getdata');
-    Route::post('/api/medicines/getprice', [MedicinesController::class, 'getPrice'])
-        ->name('medicines.getprice');
+});
 
 
+Route::middleware([
+    'auth',
+    'role:' . UserRole::Admin->value . ',' . UserRole::Pharmacist->value,
+])->group(function () {
+    //resep dokter
+    Route::get('/resep', function () {
+        return Inertia::render('ResepDokter/Index');
+    })->name('resep');
     //api resep dokter
     Route::post('/api/resep/getdata', [ResepDokterController::class, 'getData'])
         ->name('resep.index');
     Route::post('/api/resep/update', [ResepDokterController::class, 'update'])
         ->name('resep.update');
+    //api export
+    Route::get('/api/resep/{id}/pdf', [ResepDokterController::class, 'exportPdf']);
+});
+
+Route::middleware([
+    'auth',
+    'role:' . UserRole::Admin->value . ',' . UserRole::Pharmacist->value . ',' . UserRole::Pharmacist->value,
+])->group(function () {
+    // medicines
+    Route::get('/masterObat', function () {
+        return Inertia::render('MasterObat/Index');
+    })->name('masterObat');
+    //api medicines
+    Route::post('/api/medicines/getdata', [MedicinesController::class, 'getData'])
+        ->name('medicines.getdata');
+    Route::post('/api/medicines/getprice', [MedicinesController::class, 'getPrice'])
+        ->name('medicines.getprice');
 });
 
 require __DIR__ . '/settings.php';

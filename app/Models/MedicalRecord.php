@@ -46,4 +46,8 @@ class MedicalRecord extends Model
     {
         return $this->hasMany(ResepDokter::class);
     }
+    public function pembayaran()
+    {
+        return $this->hasMany(Pembayaran::class);
+    }
 }

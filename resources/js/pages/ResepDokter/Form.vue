@@ -48,7 +48,7 @@
             <FInput
                 :loading="data.loading"
                 :disabled="true"
-                v-model="data.total_price"
+                v-model="data.rp_total_price"
             >
             </FInput>
         </template>
@@ -205,6 +205,7 @@ const data = reactive({
     is_paid: [] as any,
     medicines: [] as any,
     list_medId: [] as any,
+    rp_total_price: null as any,
     total_price: null as any,
 });
 
@@ -212,12 +213,14 @@ async function submit() {
     if (data.loading) return;
     data.loading = true;
     const is_paid = data.is_paid.id;
+    const total_price = data.total_price;
 
     try {
         let response = {} as any;
         response = await axios.post('/api/resep/update', {
             id: props.selectedId,
             is_paid: is_paid,
+            total_price: total_price,
         });
 
         showSuccess(response.data.message ?? 'Data has been saved');
@@ -324,12 +327,21 @@ async function getMedicineData() {
         });
 
         data.medicines = res.data;
-        data.total_price = getTotalPrice(data.medicines);
+        data.total_price = getTotalPriceInt(data.medicines);
+        data.rp_total_price = getTotalPrice(data.medicines);
     } catch (error) {
         showError(error);
     } finally {
         data.loading = false;
     }
+}
+
+function getTotalPriceInt(medicines: any[]): string {
+    const total = medicines.reduce(
+        (sum, item) => sum + Number(item.unit_price || 0),
+        0,
+    );
+    return total;
 }
 
 function getTotalPrice(medicines: any[]): string {
@@ -345,9 +357,42 @@ function getTotalPrice(medicines: any[]): string {
     }).format(total);
 }
 
+async function exportPdf(id: any) {
+    if (data.loading) return;
+    data.loading = true;
+
+    try {
+        const res = await axios.get(`/api/resep/${id}/pdf`, {
+            responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `invoice-${id}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch (error: any) {
+        if (error.response?.data?.errors) {
+            const messages = Object.values(error.response.data.errors)
+                .flat()
+                .join('\n');
+            showError(messages);
+            data.loading = false;
+        } else {
+            showError(error);
+            data.loading = false;
+        }
+    } finally {
+        data.loading = false;
+    }
+}
+
 defineExpose({
     submit,
     getData,
+    exportPdf,
 });
 
 onMounted(async () => {
