@@ -21,21 +21,21 @@ Aplikasi **Rekam Medis** untuk manajemen data pasien, resep dokter, dan pembayar
 
 ## Instalasi
 
-1. Clone repository:
+### 1. Clone repository:
 
 ```
 git clone https://github.com/doniarifin/medication-app.git
 cd medication-app
 ```
 
-2. Install Depedencies
+### 2. Install Depedencies
 
 ```
 composer install
 npm install
 ```
 
-3. Copy .env
+### 3. Copy .env
 
 ```
 cp .env.example .env
@@ -52,7 +52,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-4. Generate key lalu jalankan migrate
+### 4. Generate key lalu jalankan migrate
 
 ```
 php artisan key:generate
@@ -65,7 +65,7 @@ jika ingin ulang jalnakan
 php artisan migrate:fresh
 ```
 
-5. Jalankan DB seed (untuk import data medicines dan prices)
+### 5. Jalankan DB seed (untuk import data medicines dan prices)
 
     sudah saya sertakan user sesuai role admin, dokter, dan apoteker dapat di lihat di `./database/seeders/DatabaseSeeder.php`
 
@@ -93,7 +93,7 @@ case Doctor = 'doctor';
 
 maka column **role** di taber **users** harus `doctor`
 
-6. Jalankan app
+### 6. Jalankan app
 
     untuk menjalankan aplikasi, bisa menggunakan salah satu dari dua cara:
 
