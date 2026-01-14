@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resep_dokters', function (Blueprint $table) {
+        Schema::create('medicine_prices', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->timestamp('examined_at');
-            $table->json('resep_dokter')->nullable();
-            $table->foreignUuid('medical_record_id')->constrained()->cascadeOnDelete();
+            // $table->uuid('medicine_id');
+            $table->decimal('unit_price', 13, 2);
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+            $table->foreignUuid('medicine_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resep_dokters');
+        Schema::dropIfExists('medicines_prices');
     }
 };

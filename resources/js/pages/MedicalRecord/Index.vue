@@ -36,7 +36,7 @@
                     {{ 'Paid' }}
                 </template>
                 <template #row_is_paid="{ row }">
-                    {{ row.is_paid ? 'Yes' : 'No' }}
+                    {{ row.is_paid ? 'Yes' : 'Not yet' }}
                 </template>
                 <template #row_examined_at="{ row }">
                     {{ convertStrDate(row.examined_at) }}
@@ -111,9 +111,9 @@ const showModal = ref(false);
 function addNew() {
     router.visit('rekam-medis/create');
 }
-function editData(id: string) {
+function editData(records: any) {
     // console.log(id);
-    router.visit(`/rekam-medis/${id}/edit`);
+    router.visit(`/rekam-medis/${records.id}/edit`);
 }
 
 function deleteData(record: any) {
@@ -172,7 +172,7 @@ function convertStrDate(datetime: string): string {
 watch(
     () => props.records,
     (val) => {
-        data.records = val?.data;
+        data.records = val?.data ?? [];
         data.loading = false;
     },
     { immediate: true },

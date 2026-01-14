@@ -100,6 +100,11 @@
                         :key="index"
                     >
                         <input v-model="med.id" hidden />
+                        <!-- <FInput
+                            v-model="med.name"
+                            :loading="data.loading"
+                            kind="text"
+                        ></FInput> -->
                         <!-- {{ form.resep_dokter }} -->
                         <ASelectItem
                             :items="listMedicines"
@@ -247,9 +252,26 @@ const data = reactive({
     resep_dokter: medicines,
 });
 
+function mapSpecificKey<T extends { id: any } & Record<string, any>>(
+    data: T[],
+    keys: (keyof T)[],
+): Partial<T>[] {
+    return data
+        .filter((item) => item.id !== null)
+        .map((item) => {
+            const result: Partial<T> = {};
+
+            keys.forEach((key) => {
+                result[key] = item[key];
+            });
+
+            return result;
+        });
+}
+
 const listMedicines = ref<SelectItem[]>([
-    { id: '1', name: 'test', description: 'desc1' },
-    { id: '2', name: 'test2', description: 'desc2' },
+    { id: '1', name: 'test' },
+    { id: '2', name: 'test2' },
 ]);
 
 // const selectedItem = ref();
@@ -294,9 +316,9 @@ function handleDatepicker(val: any) {
 async function submit() {
     if (data.loading) return;
     data.loading = true;
+    console.log(form.file);
 
     // form.body_temperature = Number(form.body_temperature);
-    console.log('before', form);
 
     form.resep_dokter = mapSpecificKey(data.resep_dokter, [
         'id',
@@ -320,7 +342,7 @@ async function submit() {
             response = await axios.post('/api/rekam-medis/insert', form);
         }
 
-        // console.log(response);
+        console.log(response);
 
         await uploadData(response.data?.data);
 
@@ -348,20 +370,6 @@ async function submit() {
     } finally {
         // data.loading = false;
     }
-}
-
-function mapSpecificKey(arr: any[], keys: string[]) {
-    return arr.map((item) => {
-        const mapped: any = {};
-        keys.forEach((key) => {
-            if (key === 'id') {
-                mapped[key] = item[key];
-            } else {
-                mapped[key] = item[key] !== undefined ? item[key] : '';
-            }
-        });
-        return mapped;
-    });
 }
 
 async function redirect() {
@@ -404,9 +412,8 @@ async function uploadData(record: any) {
 
 async function getData() {
     const idMedical = props?.medicalRecord?.id;
-    // console.log('props', props);
 
-    // console.log(idMedical);
+    console.log(idMedical);
     if (!idMedical) {
         return;
     }
@@ -478,7 +485,6 @@ async function getMedicineData() {
     // console.log('yuhu', form.resep_dokter);
     if (props.form == 'edit') {
         data.resep_dokter = form.resep_dokter;
-        // console.log('resep', data.resep_dokter);
         if (!data.resep_dokter.length) {
             addMedicine();
         }

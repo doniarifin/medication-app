@@ -14,11 +14,13 @@ class ResepDokter extends Model
 
     protected $fillable = [
         'medical_record_id',
+        'examined_at',
         'resep_dokter',
         'updated_at',
     ];
 
     protected $casts = [
+        'examined_at' => 'datetime',
         'resep_dokter' => 'array',
     ];
 

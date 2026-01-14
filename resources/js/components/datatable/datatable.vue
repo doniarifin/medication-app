@@ -11,10 +11,12 @@
             </AButton>
 
             <!-- add Button -->
-            <AButton @click.once="addNew" class="cursor-pointer">
-                <Icon name="plus" />
-                Add New
-            </AButton>
+            <div v-if="props.withAddBtn">
+                <AButton @click.once="addNew" class="cursor-pointer">
+                    <Icon name="plus" />
+                    Add New
+                </AButton>
+            </div>
         </div>
 
         <div class="mb-2 p-2" v-if="openFilter">
@@ -43,7 +45,7 @@
                         </th>
                         <slot name="head" />
                         <th
-                            v-if="paginatedRecords.length"
+                            v-if="paginatedRecords.length && props.withAction"
                             class="w-[140px] border px-3 py-2"
                         >
                             Action
@@ -87,7 +89,8 @@
                             <slot name="action_body" />
                             <div class="flex justify-center">
                                 <AButton
-                                    @click.once="editData(row.id)"
+                                    v-if="props.allwedRole && props.withEditBtn"
+                                    @click.prevent="editData(row)"
                                     variant="ghost"
                                     class="cursor-pointer hover:opacity-50"
                                 >
@@ -98,6 +101,9 @@
                                     ></Icon>
                                 </AButton>
                                 <AButton
+                                    v-if="
+                                        props.allwedRole && props.withDeleteBtn
+                                    "
                                     @click.prevent="deleteData(row)"
                                     variant="ghost"
                                     class="cursor-pointer hover:opacity-50"
@@ -193,11 +199,32 @@ import AButton from '../app/AButton.vue';
 import Icon from '../Icon.vue';
 import { Spinner } from '../ui/spinner';
 
-const props = defineProps<{
-    // url: string;
-    records: Array<Record<string, any>>;
-    loading: boolean;
-}>();
+type RecordRow = Record<string, any>;
+
+const props = withDefaults(
+    defineProps<{
+        records?: RecordRow[];
+        loading?: boolean;
+        withAddBtn?: boolean;
+        allwedRole?: boolean;
+        withAction?: boolean;
+        withEditBtn?: boolean;
+        withDeleteBtn?: boolean;
+        listHeader?: Record<string, string>;
+        hiddenColumns?: string[];
+    }>(),
+    {
+        records: () => [],
+        loading: false,
+        withAddBtn: true,
+        allwedRole: true,
+        withAction: true,
+        withEditBtn: true,
+        withDeleteBtn: true,
+        listHeader: () => ({}),
+        hiddenColumns: () => ['id'],
+    },
+);
 
 const emit = defineEmits({
     addNew: null,
@@ -211,13 +238,19 @@ const emit = defineEmits({
 
 const openFilter = ref(false);
 // const headTable = ref(null);
+const safeRecords = computed<any[]>(() => props.records ?? []);
 
-const hiddenColumns = ['id'];
+const hiddenColumns = computed<any[]>(() => props.hiddenColumns ?? []);
 
 const headers = computed(() => {
-    if (!props.records.length) return [];
-    return Object.keys(props.records[0]).filter(
-        (key) => !hiddenColumns.includes(key),
+    if (Object.keys(props.listHeader).length > 0) {
+        return Object.keys(props.listHeader).filter(
+            (key) => !hiddenColumns.value.includes(key),
+        );
+    }
+    if (!safeRecords.value.length) return [];
+    return Object.keys(safeRecords.value[0]).filter(
+        (key) => !hiddenColumns.value.includes(key),
     );
 });
 
@@ -225,7 +258,7 @@ const currentPage = ref(1);
 const perPage = ref(5);
 
 const totalPages = computed(() =>
-    Math.ceil(props.records.length / perPage.value),
+    Math.ceil(safeRecords.value.length / perPage.value),
 );
 
 const perPageOptions = [3, 5, 10, 20, 50];
@@ -233,7 +266,7 @@ const perPageOptions = [3, 5, 10, 20, 50];
 const paginatedRecords = computed(() => {
     const start = (currentPage.value - 1) * perPage.value;
     const end = start + perPage.value;
-    return props.records.slice(start, end);
+    return safeRecords.value.slice(start, end);
 });
 
 function changePerPage(value: number) {

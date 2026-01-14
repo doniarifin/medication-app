@@ -2,16 +2,17 @@
     <transition name="fade">
         <div
             v-if="modelValue"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
             @click.self="close"
         >
             <transition name="scale">
                 <div
                     v-show="modelValue"
-                    class="w-full max-w-lg rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800"
+                    :class="`max-w-${props.width}`"
+                    class="flex max-h-[90vh] w-full flex-col rounded-lg bg-white shadow-lg dark:bg-gray-800"
                 >
                     <!-- Header -->
-                    <div class="mb-2 flex items-center justify-between">
+                    <div class="flex items-center justify-between border-b p-4">
                         <h3 class="text-lg font-semibold">{{ props.title }}</h3>
                         <a-button
                             variant="ghost"
@@ -23,16 +24,23 @@
                     </div>
 
                     <!-- Content -->
-                    <div class="modal-body mb-8">
+                    <div class="flex-1 space-y-4 overflow-y-auto p-4">
                         <slot name="body"></slot>
                     </div>
 
                     <!-- Footer -->
-                    <div
-                        v-if="$slots.footer"
-                        class="mt-4 flex justify-end gap-2"
-                    >
-                        <slot name="footer"></slot>
+                    <div class="flex justify-end gap-2 border-t p-4">
+                        <slot name="footer">
+                            <AButton
+                                as="button"
+                                v-if="!props.removeSaveBtn"
+                                :disabled="props.disabledSaveBtn"
+                                type="submit"
+                                class="cursor-pointer"
+                                @click.prevent="submit"
+                                >Save</AButton
+                            >
+                        </slot>
                     </div>
                 </div>
             </transition>
@@ -47,12 +55,22 @@ import AButton from './AButton.vue';
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
     title: { type: String, default: 'Modal' },
+    disabledSaveBtn: { type: Boolean, default: false },
+    removeSaveBtn: { type: Boolean, default: false },
+    width: {
+        type: String as () => 'sm' | 'lg' | 'xl' | '2xl' | '3xl' | 'full',
+        default: 'lg',
+    },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'submit']);
 
 function close() {
     emit('update:modelValue', false);
+}
+
+function submit(e: Event) {
+    emit('submit', e);
 }
 </script>
 

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MedicalRecord;
+use App\Models\MedicinePrices;
 use App\Models\Medicines;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class MedicinesController extends Controller
 {
@@ -74,6 +78,34 @@ class MedicinesController extends Controller
             // 'medical_record_id' => $request->medical_record_id,
             // 'is_deleted' => $request->is_deleted ? 1 : 0
         ])->get();
+
+        return response()->json($records);
+    }
+
+    //api get med price
+
+    public function getPrice(Request $request)
+    {
+        // $today = Carbon::today()->endOfDay();
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        $records = MedicinePrices::query()
+            ->when($request->filled('medicine_id'), function ($q) use ($request) {
+                $q->whereIn('medicine_id', $request->medicine_id);
+            })
+            // ->whereDate('start_date', '<=', $startDate)
+            ->where(function ($q) use ($startDate) {
+                $q->Where('start_date', '<=', $startDate);
+            })
+            // end_date harus NULL atau >= tanggal
+            ->where(function ($q) use ($endDate) {
+                $q
+                    // ->whereNull('end_date')
+                    ->Where('end_date', '>=', $endDate);
+            })
+            ->orderByDesc('created_at')
+            ->get();
 
         return response()->json($records);
     }

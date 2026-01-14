@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MedicalRecord;
+use App\Models\ResepDokter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class ResepDokterController extends Controller
 {
@@ -13,6 +17,39 @@ class ResepDokterController extends Controller
     {
         //
     }
+
+    public function getData(Request $request)
+    {
+        $records = MedicalRecord::query()
+            ->when($request->filled('id'), fn($q) => $q->where('id', $request->id))
+            ->when(
+                $request->filled('patient_name'),
+                fn($q) => $q->where('patient_name', 'like', '%' . $request->patient_name . '%')
+            )
+            ->when(
+                $request->filled('start_date') && $request->filled('end_date'),
+                fn($q) => $q->whereBetween('examined_at', [
+                    $request->start_date . ' 00:00:00',
+                    $request->end_date . ' 23:59:59',
+                ])
+            )
+            ->with(['resepDokter' => function ($q) {
+                $q->orderBy('id')->limit(1);
+            }])
+            ->orderByDesc('created_at')
+            ->get();
+
+        $data = $records->map(function ($record) {
+            $record->resep_dokter = $record->resepDokter->first();
+            unset($record->resepDokter);
+            return $record;
+        });
+
+        return response()->json($data);
+    }
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -49,9 +86,40 @@ class ResepDokterController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $record = MedicalRecord::find($request->id);
+
+        if (!$record) {
+            return response()->json([
+                'message' => 'Record not found'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'is_paid' => 'required|bool',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $record->update([
+                'is_paid' => (bool) $validated['is_paid'],
+                'updated_at'  => now(),
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        return response()->json([
+            "messages" => "update success",
+            'data' => [
+                'medical_record' => $record->fresh(),
+            ]
+        ]);
     }
 
     /**

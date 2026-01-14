@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import ADashboard from '@/components/app/ADashboard.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
+import { onMounted, reactive } from 'vue';
 import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -11,6 +14,28 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
 ];
+
+const data = reactive({
+    loading: false,
+    records: [] as any,
+});
+
+async function getData() {
+    data.loading = true;
+
+    try {
+        const res = await axios.post('/api/rekam-medis/getdata');
+        data.records = res.data;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        data.loading = false;
+    }
+}
+
+onMounted(async () => {
+    await getData();
+});
 </script>
 
 <template>
@@ -24,7 +49,14 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <div
                     class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <PlaceholderPattern />
+                    <ADashboard
+                        :loading="data.loading"
+                        :month-patients="data.records?.monthpatiens"
+                        :paid-patients="data.records?.paid_patiens"
+                        :unpaid-patients="data.records?.unpaid_patients"
+                        :today-patients="data.records?.monthpatiens"
+                    >
+                    </ADashboard>
                 </div>
                 <div
                     class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"

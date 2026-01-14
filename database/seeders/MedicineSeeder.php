@@ -14,14 +14,37 @@ class MedicineSeeder extends Seeder
      */
     public function run(): void
     {
-        $json = File::get(storage_path('app/public/medicines.json'));
+        $json = File::get(storage_path('app/public/medicine_prices.json'));
         $data = json_decode($json, true);
 
-        foreach ($data['medicines'] as $medicine) {
-            DB::table('medicines')->updateOrInsert(
-                ['id' => $medicine['id']],
-                ['name' => $medicine['name']]
-            );
-        }
+        DB::transaction(function () use ($data) {
+            foreach ($data['medicines'] as $medicine) {
+
+                // insert / update medicine
+                DB::table('medicines')->updateOrInsert(
+                    ['id' => $medicine['id']],
+                    [
+                        'name' => $medicine['name'],
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]
+                );
+
+                // insert prices
+                foreach ($medicine['prices'] ?? [] as $price) {
+                    DB::table('medicine_prices')->updateOrInsert(
+                        ['id' => $price['id']],
+                        [
+                            'medicine_id' => $medicine['id'],
+                            'unit_price' => $price['unit_price'],
+                            'start_date' => $price['start_date']['value'],
+                            'end_date' => $price['end_date']['value'],
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
+                    );
+                }
+            }
+        });
     }
 }

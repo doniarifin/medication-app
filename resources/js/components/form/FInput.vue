@@ -9,9 +9,12 @@
                 v-model="internalValue"
                 :type="props.kind"
                 :placeholder="placeholder"
-                :disabled="disabled"
+                :disabled="props.disabled"
                 :loading="props.loading"
-                :class="props.class"
+                :class="[
+                    props.class,
+                    props.disabled ? 'bg-gray-100 text-gray-500' : '',
+                ]"
                 class="custom-input w-full focus:outline-none"
             />
             <Skeleton v-else class="custom-input h-10" />
@@ -23,11 +26,13 @@
                     :formats="{ input: 'dd MMM yyyy' }"
                     :time-config="{ enableTimePicker: false }"
                     v-model="internalValue"
+                    :disabled="props.disabled"
                     class="datepicker w-full focus:outline-none"
                 ></VueDatePicker>
                 <VueDatePicker
                     v-else-if="props.kindDate == 'only-year'"
                     :time-config="{ enableTimePicker: false }"
+                    :disabled="props.disabled"
                     year-picker
                     v-model="internalValue"
                     class="datepicker w-full focus:outline-none"
@@ -36,6 +41,7 @@
                     v-else
                     year-picker
                     v-model="internalValue"
+                    :disabled="props.disabled"
                     class="datepicker w-full focus:outline-none"
                 ></VueDatePicker>
             </div>
@@ -45,6 +51,7 @@
             <textarea
                 v-if="!props.loading"
                 v-model="internalValue"
+                :disabled="props.disabled"
                 class="custom-input col-span-2 w-full focus:outline-none"
                 :placeholder="placeholder"
             />

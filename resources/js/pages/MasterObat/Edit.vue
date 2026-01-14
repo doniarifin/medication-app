@@ -17,7 +17,6 @@ const props = defineProps({
         :vital-sign="props.vitalSign"
         :med-attachment="props.medAttachment"
         :med-notes="props.medicalNotes"
-        :resep-dokter="props.resepDokter"
         :form="'edit'"
     />
 </template>

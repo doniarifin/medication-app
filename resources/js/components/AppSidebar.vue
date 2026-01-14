@@ -12,10 +12,10 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { UserRole } from '@/enums/userRole';
-import { dashboard, rekamMedis } from '@/routes';
+import { dashboard, masterObat, rekamMedis, resep } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Notebook } from 'lucide-vue-next';
+import { LayoutGrid, ListChecks, Stethoscope, Tablets } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
@@ -36,7 +36,28 @@ const mainNavItems = computed<NavItem[]>(() => {
         items.push({
             title: 'Rekam Medis',
             href: rekamMedis(),
-            icon: Notebook,
+            icon: Stethoscope,
+        });
+    }
+
+    if (
+        userRole.value === UserRole.Doctor ||
+        userRole.value === UserRole.Pharmacist
+    ) {
+        items.push({
+            title: 'Resep Dokter',
+            href: resep(),
+            icon: ListChecks,
+        });
+    }
+    if (
+        userRole.value === UserRole.Doctor ||
+        userRole.value === UserRole.Pharmacist
+    ) {
+        items.push({
+            title: 'Master Obat',
+            href: masterObat(),
+            icon: Tablets,
         });
     }
 

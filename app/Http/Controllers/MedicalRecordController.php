@@ -109,6 +109,7 @@ class MedicalRecordController extends Controller
             ]);
 
             $medicalRecord->resepDokter()->create([
+                'examined_at' => $validated['examined_at'],
                 'resep_dokter' => $validated['resep_dokter'],
             ]);
 
@@ -231,6 +232,7 @@ class MedicalRecordController extends Controller
             //resep dokter
             $resepDokter = ResepDokter::where('medical_record_id', $record->id)->first();
             $resepDokter?->update([
+                'examined_at' => $validated['examined_at'],
                 'resep_dokter' => $validated['resep_dokter'],
                 'updated_at'  => now(),
             ]);

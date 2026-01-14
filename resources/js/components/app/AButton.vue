@@ -25,6 +25,7 @@ const props = defineProps({
         default: 'default',
     },
     class: { type: String, default: '' },
+    as: { type: String, default: 'div' },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
 });
@@ -32,7 +33,7 @@ const props = defineProps({
 
 <template>
     <Button
-        :as="'div'"
+        :as="props.as"
         :size="props.size"
         :variant="props.variant"
         :class="[

@@ -5,10 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
-class Medicines extends Model
+class MedicinePrices extends Model
 {
-    //
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -16,12 +14,11 @@ class Medicines extends Model
 
     protected $fillable = [
         'name',
+        'medicine_id',
+        'unit_price',
+        'start_date',
+        'end_date',
     ];
-
-    public function medicinePrice()
-    {
-        return $this->hasMany(MedicinePrices::class);
-    }
 
     // generate uuid
     protected static function booted()
