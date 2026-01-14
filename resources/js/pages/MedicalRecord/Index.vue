@@ -70,6 +70,30 @@
                 </AButton>
             </template>
         </AModal>
+
+        <!-- modal view -->
+        <AModal
+            type="form"
+            v-model="showEditModal"
+            :title="`${breadcrumbs[0]?.title}`"
+            width="xl"
+            :removeSaveBtn="true"
+        >
+            <template #body>
+                <Form
+                    :hideHeader="true"
+                    :readOnly="true"
+                    :loading="data.loading"
+                    ref="formRef"
+                    :selectedId="data.selectedId"
+                    :medical-record="data.props?.medicalRecord"
+                    :vital-sign="data.props?.vitalSign"
+                    :med-attachment="data.props?.medAttachment"
+                    :med-notes="data.props?.medicalNotes"
+                    :form="'view'"
+                />
+            </template>
+        </AModal>
     </AppLayout>
 </template>
 
@@ -87,6 +111,7 @@ import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import moment from 'moment';
 import { onMounted, reactive, ref, watch } from 'vue';
+import Form from './Form.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -98,6 +123,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 const props = defineProps({
     records: Object,
     filters: Object,
+    medicalRecord: Object,
+    medAttachment: Object,
+    vitalSign: Object,
+    medicalNotes: Object,
 });
 
 const data = reactive({
@@ -105,13 +134,23 @@ const data = reactive({
     selectedId: '',
     records: [] as any,
     filter: {} as any,
+    props: [] as any,
 });
 
 const showModal = ref(false);
+const showEditModal = ref(false);
+
 function addNew() {
     router.visit('rekam-medis/create');
 }
-function editData(records: any) {
+async function editData(records: any) {
+    if (records.is_paid) {
+        // const data = await getDataById(records.id);
+        data.selectedId = records.id;
+        // console.log(data);
+        showEditModal.value = true;
+        return;
+    }
     // console.log(id);
     router.visit(`/rekam-medis/${records.id}/edit`);
 }
@@ -168,6 +207,21 @@ function clearFilter() {
 function convertStrDate(datetime: string): string {
     return moment(datetime).format('DD MMM YYYY');
 }
+
+// async function getDataById(id: string) {
+//     data.loading = true;
+
+//     try {
+//         const res = await axios.get('/api/rekam-medis/getbyid/' + id);
+//         data.props = res.data;
+//         data.loading = false;
+//         return res.data;
+//     } catch (error) {
+//         showError(String(error));
+//     } finally {
+//         data.loading = false;
+//     }
+// }
 
 watch(
     () => props.records,

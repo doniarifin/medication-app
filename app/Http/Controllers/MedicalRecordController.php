@@ -272,4 +272,22 @@ class MedicalRecordController extends Controller
 
         return response()->json($records);
     }
+
+    // api get data by id
+    public function getById(string $id)
+    {
+        $medicalRecord = MedicalRecord::findOrFail($id);
+        $vitalSign = VitalSign::where('medical_record_id', $medicalRecord->id)->first();
+        $medAttachment = MedicalAttachment::where('medical_record_id', $medicalRecord->id)->first();
+        $resepDokter = ResepDokter::where('medical_record_id', $medicalRecord->id)->first();
+        $medicalNotes = MedicalNote::where('medical_record_id', $medicalRecord->id)->first();
+
+        return response()->json([
+            'medical_record' => $medicalRecord->fresh(),
+            'vital_sign' => $vitalSign,
+            'medical_attachment' => $medAttachment,
+            'resep_dokter' => $resepDokter,
+            'medical_notes' => $medicalNotes,
+        ]);
+    }
 }

@@ -62,6 +62,8 @@ Route::middleware([
         ->name('rekam-medis.update');
     Route::delete('/api/rekam-medis/{id}', [MedicalRecordController::class, 'destroy'])
         ->name('rekam-medis.delete');
+    Route::get('/api/rekam-medis/getbyid/{id}', [MedicalRecordController::class, 'getById'])
+        ->name('rekam-medis.getbyid');
 
     //upload
     Route::post('/api/attachment/gets', [AttachmentController::class, 'gets'])

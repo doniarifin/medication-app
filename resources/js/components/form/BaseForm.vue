@@ -7,6 +7,7 @@ const props = defineProps<{
     title: string;
     loading?: boolean;
     backUrl?: string;
+    hideHeader?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -25,6 +26,7 @@ function back() {
 <template>
     <!-- Header -->
     <div
+        v-if="!props.hideHeader"
         class="sticky top-0 z-30 flex items-center justify-between border-b bg-white px-6 py-4 shadow-sm"
     >
         <div class="flex items-center gap-3">
@@ -60,7 +62,8 @@ function back() {
     </div>
     <form
         @submit.prevent="emit('submit')"
-        class="space-y-6 bg-white p-6 pb-20 shadow"
+        :class="!props.hideHeader ? 'p-6 shadow' : ''"
+        class="space-y-6 bg-white pb-20"
     >
         <!-- Content -->
         <div class="space-y-4">

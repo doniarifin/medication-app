@@ -1,6 +1,7 @@
 <template>
     <AppContent />
     <BaseForm
+        :hide-header="props.hideHeader"
         :title="(props.medicalRecord ? 'Edit' : 'Add') + ' Rekam Medis'"
         :loading="data.loading"
         @submit="submit"
@@ -8,6 +9,7 @@
         <FormSection title="Informasi Pasien">
             <FInput
                 label="Nama"
+                :disabled="props.readOnly"
                 :loading="data.loading"
                 v-model="form.patient_name"
                 kind="text"
@@ -15,6 +17,7 @@
             <FInput
                 label="Tanggal Pemeriksaan"
                 :loading="data.loading"
+                :disabled="props.readOnly"
                 kind="datetime"
                 kind-date="only-date"
                 v-model="form.examined_at"
@@ -26,42 +29,49 @@
             <FInput
                 label="Tinggi Badan"
                 :loading="data.loading"
+                :disabled="props.readOnly"
                 v-model="form.height"
                 kind="number"
             />
             <FInput
                 label="Berat Badan"
                 :loading="data.loading"
+                :disabled="props.readOnly"
                 v-model="form.weight"
                 kind="number"
             />
             <FInput
                 label="Systole"
                 v-model="form.systole"
+                :disabled="props.readOnly"
                 kind="number"
                 :loading="data.loading"
             />
             <FInput
                 label="Diastole"
                 v-model="form.diastole"
+                :disabled="props.readOnly"
                 kind="number"
                 :loading="data.loading"
             />
             <FInput
                 label="Heart Rate"
                 v-model="form.heart_rate"
+                :disabled="props.readOnly"
                 kind="number"
                 :loading="data.loading"
             />
             <FInput
                 label="Respiration Rate"
                 v-model="form.respiration_rate"
+                :disabled="props.readOnly"
                 kind="number"
                 :loading="data.loading"
             />
             <FInput
                 label="Body Temperature"
                 v-model="form.body_temperature"
+                :disabled="props.readOnly"
                 kind="number"
                 :loading="data.loading"
             />
@@ -84,6 +94,7 @@
                             </div>
                             <div class="p-2">
                                 <AButton
+                                    v-if="!props.readOnly"
                                     class="cursor-pointer"
                                     variant="secondary"
                                     @click="addMedicine"
@@ -100,21 +111,25 @@
                         :key="index"
                     >
                         <input v-model="med.id" hidden />
-                        <!-- {{ form.resep_dokter }} -->
-                        <ASelectItem
-                            :items="listMedicines"
-                            v-model="data.resep_dokter[index]"
-                            :searchable="true"
-                            button-label="Pilih Obat"
-                            label-name="name"
-                            :loading="data.loading"
-                            @select="onSelectMedicine"
-                        >
-                            <template #item="{ item }">
-                                {{ item.name }}
-                            </template>
-                        </ASelectItem>
-                        <!-- {{ form.resep_dokter[index] }} -->
+                        <div v-if="!props.readOnly">
+                            <ASelectItem
+                                :items="listMedicines"
+                                v-model="data.resep_dokter[index]"
+                                :searchable="true"
+                                button-label="Pilih Obat"
+                                label-name="name"
+                                :loading="data.loading"
+                                @select="onSelectMedicine"
+                            >
+                                <template #item="{ item }">
+                                    {{ item.name }}
+                                </template>
+                            </ASelectItem>
+                        </div>
+                        <div v-else>
+                            {{ data.resep_dokter[index].name }}
+                        </div>
+
                         <div
                             class="flex w-full items-center justify-between gap-4"
                         >
@@ -125,10 +140,12 @@
                                     "
                                     :loading="data.loading"
                                     kind="text-area"
+                                    :disabled="props.readOnly"
                                 ></FInput>
                             </div>
                             <div>
                                 <AButton
+                                    v-if="!props.readOnly"
                                     class="cursor-pointer"
                                     variant="destructive"
                                     @click="removeMedicine"
@@ -145,11 +162,13 @@
         <FormSection title="Catatan Dokter">
             <FInput
                 label="Notes"
+                :disabled="props.readOnly"
                 v-model="form.notes"
                 :loading="data.loading"
                 kind="text-area"
             ></FInput>
             <FUpload
+                v-if="!props.readOnly"
                 @clear-file="clearFile"
                 @onChange="onChangefile"
                 :placeholder="'Choose File'"
@@ -174,7 +193,7 @@ import Icon from '@/components/Icon.vue';
 import { showError, showSuccess } from '@/lib/toast';
 import { router, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 const props = defineProps({
     medicalRecord: {
@@ -201,27 +220,41 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    hideHeader: {
+        type: Boolean,
+        default: false,
+    },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    selectedId: {
+        type: String,
+        default: '',
+    },
 });
 
 const form = useForm({
-    patient_name: props.medicalRecord?.patient_name ?? null,
+    patient_name: null,
     examined_at: props.medicalRecord?.examined_at
         ? convertStrDate(props.medicalRecord?.examined_at)
         : null,
     medicine_price: props.medicalRecord?.medicine_price ?? 0,
-    height: props.vitalSign?.height
-        ? convertInt(props.vitalSign?.height)
-        : null,
-    weight: props.vitalSign?.weight
-        ? convertInt(props.vitalSign?.weight)
-        : null,
-    blood_pressure: props.vitalSign?.blood_pressure ?? null,
-    systole: props.vitalSign?.systole ?? null,
-    diastole: props.vitalSign?.diastole ?? null,
-    heart_rate: props.vitalSign?.heart_rate ?? null,
-    respiration_rate: props.vitalSign?.respiration_rate ?? null,
-    body_temperature: props.vitalSign?.body_temperature ?? null,
-    resep_dokter: props.resepDokter?.resep_dokter ?? ([] as any),
+    //
+    height: null as any,
+    weight: null as any,
+    blood_pressure: null,
+    systole: null,
+    diastole: null,
+    heart_rate: null,
+    respiration_rate: null,
+    body_temperature: null,
+    //
+    resep_dokter: [] as any,
     notes: props.medNotes?.notes ?? null,
     file: null,
 });
@@ -240,7 +273,7 @@ const medicines = ref([
 
 const data = reactive({
     loading: false,
-    records: [],
+    records: null as any,
     filter: {} as any,
     fileName: '',
     attachment: {} as any,
@@ -404,7 +437,7 @@ async function uploadData(record: any) {
 
 async function getData() {
     const idMedical = props?.medicalRecord?.id;
-    // console.log('props', props);
+    console.log('props', props);
 
     // console.log(idMedical);
     if (!idMedical) {
@@ -430,6 +463,26 @@ async function getData() {
             showError(error);
             data.loading = false;
         }
+    } finally {
+        data.loading = false;
+    }
+}
+
+async function getDataById() {
+    if (!props.readOnly) {
+        return;
+    }
+    data.loading = true;
+
+    try {
+        const res = await axios.get(
+            '/api/rekam-medis/getbyid/' + props.selectedId,
+        );
+        data.records = res.data;
+        data.loading = false;
+        return res.data;
+    } catch (error) {
+        showError(String(error));
     } finally {
         data.loading = false;
     }
@@ -476,6 +529,7 @@ async function getMedicineData() {
 
     listMedicines.value = res.data;
     // console.log('yuhu', form.resep_dokter);
+    console.log(props.form);
     if (props.form == 'edit') {
         data.resep_dokter = form.resep_dokter;
         // console.log('resep', data.resep_dokter);
@@ -483,11 +537,61 @@ async function getMedicineData() {
             addMedicine();
         }
     }
+    if (props.form == 'view') {
+        data.resep_dokter = form.resep_dokter;
+    }
     data.loading = false;
 }
 
+watch(
+    [() => props.medicalRecord, () => data.records],
+    ([medicalRecord, records]) => {
+        console.log('recod', records);
+        const source = medicalRecord ?? records?.medical_record;
+        if (!source) return;
+
+        form.patient_name = source.patient_name ?? null;
+        form.examined_at = source.examined_at
+            ? convertStrDate(source.examined_at)
+            : null;
+        form.medicine_price = source.medicine_price ?? 0;
+    },
+    { immediate: true },
+);
+
+watch(
+    [() => props.vitalSign, () => data.records],
+    ([vitalSign, records]) => {
+        const source = vitalSign ?? records?.vital_sign;
+        if (!source) return;
+
+        form.height = source.height ? convertInt(source.height) : null;
+        form.weight = source.weight ? convertInt(source.weight) : null;
+        form.blood_pressure = source.blood_pressure ?? null;
+        form.systole = source.systole ?? null;
+        form.diastole = source.diastole ?? null;
+        form.heart_rate = source.heart_rate ?? null;
+        form.respiration_rate = source.respiration_rate ?? null;
+        form.body_temperature = source.body_temperature ?? null;
+    },
+    { immediate: true },
+);
+
+watch(
+    [() => props.resepDokter, () => data.records],
+    ([resepDokter, records]) => {
+        console.log('recod', records);
+        const source = resepDokter ?? records?.resep_dokter;
+        if (!source) return;
+
+        form.resep_dokter = source.resep_dokter ?? null;
+    },
+    { immediate: true },
+);
+
 onMounted(async () => {
     await getData();
+    await getDataById();
     await getAttachment();
     await getMedicineData();
 });

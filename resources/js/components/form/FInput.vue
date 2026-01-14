@@ -8,7 +8,7 @@
                 v-if="!props.loading"
                 v-model="internalValue"
                 :type="props.kind"
-                :placeholder="placeholder"
+                :placeholder="props.disabled ? '' : placeholder"
                 :disabled="props.disabled"
                 :loading="props.loading"
                 :class="[
@@ -52,8 +52,12 @@
                 v-if="!props.loading"
                 v-model="internalValue"
                 :disabled="props.disabled"
+                :class="[
+                    props.class,
+                    props.disabled ? 'bg-gray-100 text-gray-500' : '',
+                ]"
                 class="custom-input col-span-2 w-full focus:outline-none"
-                :placeholder="placeholder"
+                :placeholder="props.disabled ? '' : placeholder"
             />
             <Skeleton v-else class="custom-input h-15" />
         </div>
