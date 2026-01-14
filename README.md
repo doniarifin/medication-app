@@ -69,17 +69,17 @@ php artisan migrate:fresh
 
 sudah saya sertakan user sesuai role admin, dokter, dan apoteker dapat di lihat di `./database/seeders/DatabaseSeeder.php`
 
-role admin
-
-email: admin@example.com
-
-pass: admin123
-
 untuk run db seed
 
 ```
 php artisan db:seed
 ```
+
+jika sudah run db seed maka bisa login dengan:
+
+email: admin@example.com
+
+pass: admin123
 
 **Note:**
 
