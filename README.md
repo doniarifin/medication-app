@@ -67,7 +67,7 @@ php artisan migrate:fresh
 
 ### 5. Jalankan DB seed (untuk import data medicines dan prices)
 
-    sudah saya sertakan user sesuai role admin, dokter, dan apoteker dapat di lihat di `./database/seeders/DatabaseSeeder.php`
+sudah saya sertakan user sesuai role admin, dokter, dan apoteker dapat di lihat di `./database/seeders/DatabaseSeeder.php`
 
 role admin
 
@@ -95,7 +95,7 @@ maka column **role** di taber **users** harus `doctor`
 
 ### 6. Jalankan app
 
-    untuk menjalankan aplikasi, bisa menggunakan salah satu dari dua cara:
+untuk menjalankan aplikasi, bisa menggunakan salah satu dari dua cara:
 
 - pakai composer
 
