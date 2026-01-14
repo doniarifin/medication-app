@@ -125,3 +125,32 @@ npm run dev
 ```
 
 Jika menggunakan `php artisan serve`, frontend (JS/Vue/Tailwind) tidak akan otomatis berjalan, harus menjalankan `npm run dev` agar tampilan dan interaksi frontend berfungsi dengan baik.
+
+## Demo
+
+Berikut penjelasan tiap bagian Menu:
+
+![Menu](./menu1.png)
+
+1. Sidebar Menu
+
+- Dashboard: Halaman utama untuk ringkasan aplikasi.
+- Rekam Medis: Halaman untuk melihat dan mengelola data pasien.
+- Resep Dokter: Halaman untuk mengelola resep yang diberikan dokter.
+- Master Obat: Halaman untuk melihat daftar obat.
+
+2. Button
+
+- Filter: Untuk mencari pasien berdasarkan nama.
+- Button edit (icon pensil) dan hapus (icon sampah) data.
+  **Edit button** hanya untuk data yg belum dibayar
+- Add New digunakan untuk menambahkan data pasien baru.
+
+##
+
+![Menu](./resep.png)
+
+1. Button Save dan export
+
+- button export disable jika belum melakukan pembayaran
+- button save akan disable jika sudah melakukan pembayaran
