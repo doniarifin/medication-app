@@ -85,7 +85,7 @@
                             </slot>
                         </td>
                         <slot name="body" />
-                        <td class="border px-3 py-2">
+                        <td class="border px-3 py-2" v-if="props.withAction">
                             <slot name="action_body" />
                             <div class="flex justify-center">
                                 <AButton

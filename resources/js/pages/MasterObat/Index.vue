@@ -13,6 +13,9 @@
                 :loading="data.loading"
                 :withAddBtn="false"
                 :withAction="false"
+                :withEditBtn="false"
+                :withDeleteBtn="false"
+                :hiddenColumns="['id', 'action']"
             >
                 <template #filter>
                     <Filter
