@@ -1,0 +1,64 @@
+{
+  "medicines": [
+    {
+      "id": "9cf72984-047a-4c48-bc12-de0c6437b5ae",
+      "name": "Cholecalciferol 1000 IU Tablet Kunyah (PROVE D3-1000)"
+    },
+    {
+      "id": "9cf72984-075b-464a-86ac-bd6d727763e3",
+      "name": "Desloratadine 5mg Tablet Salut Selaput (DEXA MEDICA)"
+    },
+    {
+      "id": "9cf72984-05b8-40d7-9cee-b326578d67f7",
+      "name": "Diazepam 5mg Tablet (VALISANBE)"
+    },
+    {
+      "id": "9cf72984-0689-497b-adb6-96a7d50931db",
+      "name": "Divalproex Sodium 250mg Tablet Pelepasan Lambat (DEXA MEDICA)"
+    },
+    {
+      "id": "9cf72984-01ed-46fa-8efc-04ce10eae2ed",
+      "name": "Esomeprazole Sodium 20mg Tablet (ESOFERR)"
+    },
+    {
+      "id": "9cf72984-04e0-4d4b-852c-8602ce4cb30b",
+      "name": "Lorazepam 2mg Tablet Salut Selaput (MERLOPAM 2)"
+    },
+    {
+      "id": "9cf72984-033d-4af8-95cb-2b4912602c8a",
+      "name": "Mecobalamin 500 mg Tablet (LAPIBAL)"
+    },
+    {
+      "id": "9cf72984-0411-4b11-969c-e13a4b116bec",
+      "name": "Mefenamic Acid 500mg Tablet Salut Selaput (MEFINAL 500)"
+    },
+    {
+      "id": "9cf72984-054d-4925-b12e-2aaf8d613401",
+      "name": "Metamizole Sodium 500mg Tablet (NOVALGIN)"
+    },
+    {
+      "id": "9cf72984-0622-4a2b-81e8-1b92fbbdeb64",
+      "name": "Methylprednisolone 8mg Tablet (SANEXON 8)"
+    },
+    {
+      "id": "9cf72984-0015-45a4-a2b4-dcf83e8fe144",
+      "name": "Paracetamol 500mg Tablet (SANMOL)"
+    },
+    {
+      "id": "9cf72984-02d4-4270-b659-708bae3c5ca1",
+      "name": "Propranolol Hydrochloride 10mg Tablet (KIMIA FARMA)"
+    },
+    {
+      "id": "9cf72984-0265-4a83-9eba-278eae10ca92",
+      "name": "Ranitidine Hydrochloride 150mg Tablet Salut Selaput (HEXPHARM)"
+    },
+    {
+      "id": "9cf72984-06f4-40e2-b434-efea9ee0d622",
+      "name": "Tranexamic Acid 500mg Tablet Salut Selaput (BERNOFARM)"
+    },
+    {
+      "id": "9cf72984-03a8-43ad-9a57-41b8c6f2ba27",
+      "name": "Vitamin E 30 IU\/ Vitamin C 750mg\/ Vitamin B1 15mg (BECOM - ZET)"
+    }
+  ]
+}

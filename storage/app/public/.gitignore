@@ -1,2 +1,4 @@
 *
 !.gitignore
+!medicines.json
+!medicine_prices.json
