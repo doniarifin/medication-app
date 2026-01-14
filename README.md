@@ -158,5 +158,5 @@ Berikut penjelasan tiap bagian Menu:
 
 click icon pencil untuk memunculkan Menu export dan update pembayaran
 
-- button export disable jika belum melakukan pembayaran
-- button save akan disable jika sudah melakukan pembayaran
+- button export akan disabled jika belum melakukan pembayaran
+- button save akan disabled jika sudah melakukan pembayaran
