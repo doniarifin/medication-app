@@ -126,7 +126,11 @@ npm run dev
 
 Jika menggunakan `php artisan serve`, frontend (JS/Vue/Tailwind) tidak akan otomatis berjalan, harus menjalankan `npm run dev` agar tampilan dan interaksi frontend berfungsi dengan baik.
 
-## Demo
+##
+
+# Demo
+
+## Rekam Medis
 
 Berikut penjelasan tiap bagian Menu:
 
@@ -146,11 +150,11 @@ Berikut penjelasan tiap bagian Menu:
   **Edit button** hanya untuk data yg belum dibayar
 - Add New digunakan untuk menambahkan data pasien baru.
 
-##
+## Resep Dokter
 
 ![Menu](./resep.png)
 
-1. Button Save dan export
+1. Export ada di menu Resep Dokter
 
 - button export disable jika belum melakukan pembayaran
 - button save akan disable jika sudah melakukan pembayaran
