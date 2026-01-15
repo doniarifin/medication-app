@@ -90,6 +90,11 @@ class MedicinesController extends Controller
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate = Carbon::parse($request->end_date)->endOfDay();
 
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = $endDate->format('Y-m-d');
+
+
+        // dd($startDate, $endDate);
         $records = MedicinePrices::query()
             ->when($request->filled('medicine_id'), function ($q) use ($request) {
                 $q->whereIn('medicine_id', $request->medicine_id);
@@ -106,6 +111,8 @@ class MedicinesController extends Controller
             })
             ->orderByDesc('created_at')
             ->get();
+
+        // dd($records);
 
         return response()->json($records);
     }
