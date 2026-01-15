@@ -439,6 +439,9 @@ async function uploadData(record: any) {
         payload.file = null;
     }
 
+    if (props.form !== 'edit') {
+        payload.medical_record_id = record.id;
+    }
     const formData = new FormData();
 
     Object.entries(payload).forEach(([key, value]) => {
