@@ -569,6 +569,7 @@ async function getMedicineData() {
 
 async function downloadFile(id: any) {
     id = form.file?.id;
+    if (!id) return;
     if (data.loading) return;
     data.loading = true;
 
