@@ -73,7 +73,7 @@ Route::middleware([
 
 Route::middleware([
     'auth',
-    'role:' . UserRole::Admin->value . ',' . UserRole::Pharmacist->value . ',' . UserRole::Pharmacist->value,
+    'role:' . UserRole::Admin->value . ',' . UserRole::Doctor->value . ',' . UserRole::Pharmacist->value,
 ])->group(function () {
     // medicines
     Route::get('/masterObat', function () {

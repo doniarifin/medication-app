@@ -83,7 +83,7 @@ import ASelectItem from '@/components/app/ASelectItem.vue';
 import BaseFormSection from '@/components/form/BaseFormSection.vue';
 import FInput from '@/components/form/FInput.vue';
 
-import { showError, showSuccess } from '@/lib/toast';
+import { showError, showInfo, showSuccess } from '@/lib/toast';
 import axios from 'axios';
 import { onMounted, reactive, ref } from 'vue';
 
@@ -373,6 +373,7 @@ async function exportPdf(id: any) {
         document.body.appendChild(link);
         link.click();
         link.remove();
+        showInfo('export pdf success');
     } catch (error: any) {
         if (error.response?.data?.errors) {
             const messages = Object.values(error.response.data.errors)
