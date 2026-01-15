@@ -84,6 +84,8 @@ Route::middleware([
         ->name('medicines.getdata');
     Route::post('/api/medicines/getprice', [MedicinesController::class, 'getPrice'])
         ->name('medicines.getprice');
+
+    Route::get('/api/download/{id}', [ResepDokterController::class, 'downloadFile']);
 });
 
 require __DIR__ . '/settings.php';

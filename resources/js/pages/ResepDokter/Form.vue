@@ -44,6 +44,34 @@
             </div>
         </template>
 
+        <template #field_notes="{ field }">
+            <FInput
+                :loading="data.loading"
+                :disabled="true"
+                :kind="field.type"
+                :label="field.label"
+                v-model="data.notes"
+            >
+            </FInput>
+        </template>
+
+        <template #field_file="{ field }">
+            <div class="text-sm text-gray-500">
+                {{ field.label }}
+            </div>
+            <AButton
+                @click="downloadFile"
+                variant="outline"
+                class="cursor-pointer"
+                as="button"
+                :disabled="!data.file?.path"
+                :loading="data.loading"
+                :label="data.file?.path ?? 'No File'"
+                v-model="data.notes"
+            >
+            </AButton>
+        </template>
+
         <template #field_total_harga="{}">
             <FInput
                 :loading="data.loading"
@@ -79,6 +107,7 @@
 </template>
 
 <script setup lang="ts">
+import AButton from '@/components/app/AButton.vue';
 import ASelectItem from '@/components/app/ASelectItem.vue';
 import BaseFormSection from '@/components/form/BaseFormSection.vue';
 import FInput from '@/components/form/FInput.vue';
@@ -141,12 +170,12 @@ const formSections = [
         fields: [
             {
                 label: 'Notes',
-                model: 'note',
+                model: 'notes',
                 type: 'text-area',
             },
             {
                 label: 'File',
-                model: 'attachment',
+                model: 'file',
                 type: 'text',
             },
         ],
@@ -207,6 +236,8 @@ const data = reactive({
     list_medId: [] as any,
     rp_total_price: null as any,
     total_price: null as any,
+    notes: null as any,
+    file: null as any,
 });
 
 async function submit() {
@@ -265,6 +296,13 @@ async function getData() {
 
         if (data.records?.resep_dokter) {
             getListMedId(data.records.resep_dokter?.resep_dokter);
+        }
+
+        if (data.records?.notes) {
+            data.notes = data.records.notes?.notes;
+        }
+        if (data.records?.file) {
+            data.file = data.records.file;
         }
         data.loading = false;
     } catch (error: any) {
@@ -374,6 +412,56 @@ async function exportPdf(id: any) {
         link.click();
         link.remove();
         showInfo('export pdf success');
+    } catch (error: any) {
+        if (error.response?.data?.errors) {
+            const messages = Object.values(error.response.data.errors)
+                .flat()
+                .join('\n');
+            showError(messages);
+            data.loading = false;
+        } else {
+            showError(error);
+            data.loading = false;
+        }
+    } finally {
+        data.loading = false;
+    }
+}
+async function downloadFile(id: any) {
+    id = data.file?.id;
+    if (data.loading) return;
+    data.loading = true;
+
+    try {
+        const res = await axios.get(`/api/download/${id}`, {
+            responseType: 'blob',
+        });
+
+        const disposition = res.headers['content-disposition'];
+
+        let filename = 'file';
+
+        if (disposition) {
+            const match = disposition.match(
+                /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+            );
+            if (match && match[1]) {
+                filename = match[1].replace(/['"]/g, '');
+            }
+        }
+
+        const blob = new Blob([res.data]);
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        showInfo('file downloading..');
     } catch (error: any) {
         if (error.response?.data?.errors) {
             const messages = Object.values(error.response.data.errors)

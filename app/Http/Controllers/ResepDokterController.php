@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MedicalAttachment;
 use App\Models\MedicalRecord;
 use App\Models\Pembayaran;
 use App\Models\ResepDokter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class ResepDokterController extends Controller
 {
@@ -42,7 +44,11 @@ class ResepDokterController extends Controller
 
         $data = $records->map(function ($record) {
             $record->resep_dokter = $record->resepDokter->first();
+            $record->notes = $record->note->first();
+            $record->file = $record->attachments->first();
             unset($record->resepDokter);
+            unset($record->note);
+            unset($record->attachments);
             return $record;
         });
 
@@ -161,5 +167,15 @@ class ResepDokterController extends Controller
         ])->setPaper('A4', 'portrait');
 
         return $pdf->download('resi-pembayaran.pdf');
+    }
+
+    //download file
+    public function downloadFile($id)
+    {
+        $file = MedicalAttachment::findOrFail($id);
+
+        return response()->streamDownload(function () use ($file) {
+            echo Storage::disk('public')->get($file->path);
+        }, $file->original_name);
     }
 }
