@@ -154,7 +154,9 @@ class ResepDokterController extends Controller
         $record = MedicalRecord::with('resepDokter')->findOrFail($id);
 
         $record->resep_dokter = $record->resepDokter->first();
+        $record->notes = $record->note->first();
         unset($record->resepDokter);
+        unset($record->note);
 
         $record->pembayaran = $record->pembayaran->first();
 

@@ -83,7 +83,7 @@
 
     <div class="section">
       <div class="section-title">Catatan Dokter</div>
-      <div>{{ $data->notes ?? '-' }}</div>
+      <div>{{ $data->notes->notes ?? '-' }}</div>
     </div>
 
     @if($data->file)
