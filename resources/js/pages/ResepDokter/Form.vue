@@ -28,7 +28,7 @@
                     :key="idx"
                     class="mb-2"
                 >
-                    <div class="flex items-start gap-2">
+                    <div v-if="value.name" class="flex items-start gap-2">
                         <span class="w-5 text-right font-medium">
                             {{ Number(idx) + 1 }}.
                         </span>
@@ -40,6 +40,7 @@
                             </div>
                         </div>
                     </div>
+                    <div v-else>-</div>
                 </div>
             </div>
         </template>

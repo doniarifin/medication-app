@@ -16,27 +16,35 @@
         <div class="flex items-center gap-2">
             <div
                 v-if="!props.loading"
-                class="flex cursor-pointer items-center gap-2"
+                class="flex cursor-pointer items-center gap-2 hover:bg-gray-100 focus:outline-none"
                 variant="outline"
                 @click="openFile"
             >
                 <div class="flex text-gray-500">
-                    <div
-                        class="custom-input flex w-full items-center gap-2 hover:bg-gray-100 focus:outline-none"
-                    >
-                        <Icon v-if="!fileName" name="Paperclip"></Icon>
-                        {{ fileName || props.placeholder }}
-                        <Icon v-if="fileName" name="file"></Icon>
+                    <div class="custom-input flex">
+                        <div class="flex w-full items-center gap-2">
+                            <Icon name="Paperclip"></Icon>
+                            {{ fileName ? '' : props.placeholder }}
+                        </div>
                     </div>
                 </div>
             </div>
+            <div
+                v-if="fileName && !props.loading"
+                @click="downloadFile"
+                class="custom-input flex cursor-pointer items-center gap-2 hover:bg-gray-100 focus:outline-none"
+            >
+                {{ fileName }}
+                <Icon name="file"></Icon>
+            </div>
             <div v-if="fileName && !props.loading">
                 <AButton
-                    variant="ghost"
+                    variant="outline"
+                    size="sm"
                     class="cursor-pointer"
                     @click="clearFile"
                 >
-                    <Icon name="x" strokeWidth="4"></Icon>
+                    <Icon name="x" color="red" strokeWidth="2"></Icon>
                 </AButton>
             </div>
             <Skeleton v-if="props.loading" class="custom-input h-10 w-30" />
@@ -70,6 +78,7 @@ const emit = defineEmits({
     'update:modelValue': null,
     clearFile: null,
     onChange: null,
+    downloadFile: null,
 });
 
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -104,6 +113,10 @@ function clearFile() {
     isDeleted.value = fileName.value == '';
     emit('update:modelValue', null);
     emit('clearFile', isDeleted.value);
+}
+
+function downloadFile() {
+    emit('downloadFile');
 }
 
 watch(

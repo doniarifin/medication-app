@@ -36,9 +36,10 @@ class ResepDokterController extends Controller
                     $request->end_date . ' 23:59:59',
                 ])
             )
-            ->with(['resepDokter' => function ($q) {
-                $q->orderBy('id')->limit(1);
-            }])
+            ->with([
+                'resepDokter' => fn($q) => $q->orderBy('id')->limit(1),
+                'attachments' => fn($q) => $q->where('is_deleted', 0)->orderBy('id'),
+            ])
             ->orderByDesc('created_at')
             ->get();
 
@@ -46,8 +47,7 @@ class ResepDokterController extends Controller
             $record->note;
             $record->resep_dokter = $record->resepDokter->first();
             $record->file = $record->attachments->first();
-            unset($record->resepDokter);
-            unset($record->attachments);
+            unset($record->resepDokter, $record->attachments);
             return $record;
         });
 

@@ -171,12 +171,29 @@
                 v-if="!props.readOnly"
                 @clear-file="clearFile"
                 @onChange="onChangefile"
+                @downloadFile="downloadFile"
                 :placeholder="'Choose File'"
                 :file-name="data.fileName"
                 v-model="form.file"
                 label="Upload File"
                 :loading="data.loading"
             />
+            <div v-if="props.readOnly">
+                <div class="text-sm text-gray-500">
+                    {{ 'File' }}
+                </div>
+                <div class="border p-2">
+                    <AButton
+                        @click="downloadFile"
+                        variant="ghost"
+                        class="w-full cursor-pointer break-words whitespace-normal"
+                        as="button"
+                        :label="form.file?.path ? data.fileName : 'No File'"
+                        :disabled="!form.file?.path"
+                    >
+                    </AButton>
+                </div>
+            </div>
         </FormSection>
     </BaseForm>
 </template>
@@ -190,7 +207,7 @@ import FInput from '@/components/form/FInput.vue';
 import FormSection from '@/components/form/FormSection.vue';
 import FUpload from '@/components/form/FUpload.vue';
 import Icon from '@/components/Icon.vue';
-import { showError, showSuccess } from '@/lib/toast';
+import { showError, showInfo, showSuccess } from '@/lib/toast';
 import { router, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { onMounted, reactive, ref, watch } from 'vue';
@@ -256,7 +273,7 @@ const form = useForm({
     //
     resep_dokter: [] as any,
     notes: props.medNotes?.notes ?? null,
-    file: null,
+    file: null as any,
 });
 
 function onSelectMedicine(item: any) {
@@ -353,7 +370,7 @@ async function submit() {
             response = await axios.post('/api/rekam-medis/insert', form);
         }
 
-        // console.log(response);
+        console.log('response', response.data?.data);
 
         await uploadData(response.data?.data);
 
@@ -410,13 +427,17 @@ async function uploadData(record: any) {
     const payload = {
         id: data.attachment?.id,
         file: form.file,
-        medical_record_id: record.id,
+        medical_record_id: record?.medical_record?.id,
         path: data.attachment?.path,
         original_name: data.attachment?.original_name,
         mime_type: data.attachment?.mime_type,
         size: data.attachment?.size,
         is_deleted: data.attachment?.is_deleted,
     };
+
+    if (!(payload.file instanceof File)) {
+        payload.file = null;
+    }
 
     const formData = new FormData();
 
@@ -543,6 +564,57 @@ async function getMedicineData() {
     data.loading = false;
 }
 
+async function downloadFile(id: any) {
+    id = form.file?.id;
+    if (data.loading) return;
+    data.loading = true;
+
+    try {
+        const res = await axios.get(`/api/download/${id}`, {
+            responseType: 'blob',
+        });
+
+        const disposition = res.headers['content-disposition'];
+
+        let filename = 'file';
+
+        if (disposition) {
+            const match = disposition.match(
+                /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+            );
+            if (match && match[1]) {
+                filename = match[1].replace(/['"]/g, '');
+            }
+        }
+
+        const blob = new Blob([res.data]);
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        showInfo('file downloading..');
+    } catch (error: any) {
+        if (error.response?.data?.errors) {
+            const messages = Object.values(error.response.data.errors)
+                .flat()
+                .join('\n');
+            showError(messages);
+            data.loading = false;
+        } else {
+            showError(error);
+            data.loading = false;
+        }
+    } finally {
+        data.loading = false;
+    }
+}
+
 watch(
     [() => props.medicalRecord, () => data.records],
     ([medicalRecord, records]) => {
@@ -580,11 +652,40 @@ watch(
 watch(
     [() => props.resepDokter, () => data.records],
     ([resepDokter, records]) => {
-        console.log('recod', records);
+        // console.log('recod', records);
         const source = resepDokter ?? records?.resep_dokter;
         if (!source) return;
 
         form.resep_dokter = source.resep_dokter ?? null;
+    },
+    { immediate: true },
+);
+
+watch(
+    [() => props.medAttachment, () => data.records],
+    ([attachment, records]) => {
+        // let source = null;
+        // if (Object.keys(attachment).length > 0) {
+        //     source = attachment;
+        // } else {
+        //     source = records?.medical_attachment;
+        // }
+        const source = attachment ?? records?.medical_attachment;
+        if (!source) return;
+
+        form.file = source ?? null;
+        console.log('formfile', form.file);
+        data.fileName = source.original_name;
+    },
+    { immediate: true },
+);
+
+watch(
+    [() => props.medNotes, () => data.records],
+    ([medNotes, records]) => {
+        const source = medNotes ?? records?.medical_notes;
+        if (!source) return;
+        form.notes = source.notes ?? null;
     },
     { immediate: true },
 );
