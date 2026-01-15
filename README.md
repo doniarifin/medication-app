@@ -5,7 +5,7 @@ Aplikasi **Rekam Medis** untuk manajemen data pasien, resep dokter, dan pembayar
 ## Stack
 
 - Laravel 12
-- MySQL 5.7
+- MySQL 8.0.4
 - VueJs
 
 ---
