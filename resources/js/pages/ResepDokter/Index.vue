@@ -12,7 +12,7 @@
                 :records="data.records"
                 :loading="data.loading"
                 :withAddBtn="false"
-                :withDeleteBtn="false"
+                :withDeleteBtn="userRole === UserRole.Admin"
                 :listHeader="data.listHeader"
                 :hiddenColumns="['id', 'created_at']"
             >
@@ -142,14 +142,15 @@ import AModal from '@/components/app/AModal.vue';
 import Datatable from '@/components/datatable/datatable.vue';
 import Filter from '@/components/Filter.vue';
 import FInput from '@/components/form/FInput.vue';
+import { UserRole } from '@/enums/userRole';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { showError, showSuccess } from '@/lib/toast';
 import { resep } from '@/routes';
 import { BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import moment from 'moment';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import Form from './Form.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -158,6 +159,9 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: resep().url,
     },
 ];
+
+const page = usePage();
+const userRole = computed(() => page.props.auth?.user?.role);
 
 const props = defineProps({
     records: Object,
