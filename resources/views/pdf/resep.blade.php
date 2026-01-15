@@ -83,7 +83,7 @@
 
     <div class="section">
       <div class="section-title">Catatan Dokter</div>
-      <div>{{ $data->notes->notes ?? '-' }}</div>
+      <div>{{ $data->note->notes ?? '-' }}</div>
     </div>
 
     @if($data->file)
@@ -108,7 +108,7 @@
     </div>
 
     <div class="section total">
-      Total Harga: Rp {{ number_format($data->pembayaran?->total_price ?? 0, 0, ',', '.') }}
+      Total Harga: Rp {{ number_format($data->pembayaran_data?->total_price ?? 0, 0, ',', '.') }}
     </div>
 
     <div class="section payment">

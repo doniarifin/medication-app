@@ -298,8 +298,8 @@ async function getData() {
             getListMedId(data.records.resep_dokter?.resep_dokter);
         }
 
-        if (data.records?.notes) {
-            data.notes = data.records.notes?.notes;
+        if (data.records?.note) {
+            data.notes = data.records.note?.notes;
         }
         if (data.records?.file) {
             data.file = data.records.file;

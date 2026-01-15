@@ -43,11 +43,10 @@ class ResepDokterController extends Controller
             ->get();
 
         $data = $records->map(function ($record) {
+            $record->note;
             $record->resep_dokter = $record->resepDokter->first();
-            $record->notes = $record->note->first();
             $record->file = $record->attachments->first();
             unset($record->resepDokter);
-            unset($record->note);
             unset($record->attachments);
             return $record;
         });
@@ -151,18 +150,16 @@ class ResepDokterController extends Controller
 
     public function exportPdf($id)
     {
-        $record = MedicalRecord::with('resepDokter')->findOrFail($id);
+        $record = MedicalRecord::findOrFail($id);
 
         $record->resep_dokter = $record->resepDokter->first();
-        $record->notes = $record->note->first();
         unset($record->resepDokter);
-        unset($record->note);
 
-        $record->pembayaran = $record->pembayaran->first();
+        $record->pembayaran_data = $record->pembayaran->first();
+        unset($record->pembayaran);
 
+        $record->note;
         $data = $record;
-
-        // dd($data);
 
         $pdf = Pdf::loadView('pdf.resep', [
             'data' => $data
