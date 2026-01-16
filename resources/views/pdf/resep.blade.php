@@ -95,17 +95,22 @@
 
     <div class="section">
       <div class="section-title">Resep</div>
+
+      @if(empty($data->resep_dokter?->resep_dokter[0]['id']))
+      <div>-</div>
+      @else
       <ul class="resep-list">
         @foreach($data->resep_dokter->resep_dokter as $item)
         <li>
           {{ $item['name'] }}
-          @if(!empty($item['description']))
-          <br><small>ket: {{ $item['description'] }}</small>
-          @endif
+          <br>
+          <small>ket: {{ $item['description'] }}</small>
         </li>
         @endforeach
       </ul>
+      @endif
     </div>
+
 
     <div class="section total">
       Total Harga: Rp {{ number_format($data->pembayaran_data?->total_price ?? 0, 0, ',', '.') }}
